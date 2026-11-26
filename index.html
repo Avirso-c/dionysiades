@@ -502,9 +502,13 @@ function renderAujourdhui() {
   h += '<div class="card"><a class="tile" href="#journal"><span>À acheter</span><b>' + (achatsAutorises(faites) ? eur(Math.max(0, b.disponible)) : 'Pas encore') + '</b></a></div>'
     + '<div class="card"><a class="tile" href="#journal"><span>À expédier</span><b>' + aExp + ' colis</b></a></div>'
     + '<div class="card"><a class="tile" href="#journal"><span>À publier</span><b>' + aPub + ' article' + (aPub > 1 ? 's' : '') + '</b></a></div>';
+  if (CLOUD && role === 'admin' && faites.length) { const der = ETAPES.find((e) => e.id === faites[faites.length - 1]);
+    h += '<details class="card adm"><summary><b>Étapes (Admin)</b><span class="grey">Ouvrir</span></summary><p class="grey">Dernière étape cochée</p><p>' + esc(der.titre) + '</p><button type="button" class="btn" data-defaire="' + der.id + '">Décocher cette étape</button></details>'; }
   o.innerHTML = h;
 }
-document.getElementById('a-out').addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d || !d.fait) return;
+document.getElementById('a-out').addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d) return;
+  if (d.defaire) { if (CLOUD && role === 'admin' && d.defaire === faites[faites.length - 1]) envoyer([{ table: 'plan_etapes', type: 'delete', cle: 'etape_id', id: d.defaire }], () => {}, () => {}); return; }
+  if (!d.fait) return;
   let nf; try { nf = valider(faites, d.fait); } catch (e) { return; }
   if (!CLOUD) { faites = nf; try { localStorage.setItem(PKEY, JSON.stringify(faites)); } catch (e) {} renderAujourdhui(); renderJournal(); return; }
   envoyer([{ table: 'plan_etapes', type: 'insert', ligne: { etape_id: d.fait } }], () => {}, () => {}); });
@@ -723,7 +727,7 @@ async function charger() {
   pret = true; cloudMsg = ''; document.body.classList.toggle('op', role !== 'admin'); document.getElementById('n-argent').hidden = role !== 'admin';
 }
 async function ecrire(ops) { for (const o of ops) {
-  if (o.type === 'delete') { const { data, error } = await sb.from(o.table).delete().eq('id', o.id).select('id'); if (error) throw new Error('Pas supprimé. Vérifie ta connexion et réessaie.'); if (!data || !data.length) throw new Error('Trop tard pour corriger. Demande à Cyrille.'); continue; }
+  if (o.type === 'delete') { const k = o.cle || 'id'; const { data, error } = await sb.from(o.table).delete().eq(k, o.id).select(k); if (error) throw new Error('Pas supprimé. Vérifie ta connexion et réessaie.'); if (!data || !data.length) throw new Error('Trop tard pour corriger. Demande à Cyrille.'); continue; }
   const q = o.type === 'insert' ? sb.from(o.table).insert(o.ligne) : sb.from(o.table).update(o.ligne).eq('id', o.id);
   const { error } = await q; if (error) throw new Error(error.code === '42501' ? 'Refusé par la base. Préviens Cyrille.' : 'Pas enregistré. Vérifie ta connexion et réessaie.'); } }
 // Saisie que la personne connectée peut encore corriger elle-même : la sienne, de moins de 10 minutes.
