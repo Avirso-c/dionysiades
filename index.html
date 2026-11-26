@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@900&family=Inter:wght@400;700&display=swap">
 <style>
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;min-height:100vh;background:linear-gradient(180deg,#d3d9df,#f1f3f5) fixed;color:#14181d;font-family:Inter,system-ui,sans-serif;font-size:19px;line-height:1.35}
 main{max-width:460px;margin:0 auto;padding:24px 20px 60px;display:flex;flex-direction:column;gap:16px}
 h1{font-family:Doto,Inter,sans-serif;font-weight:900;font-size:32px;margin:0;letter-spacing:.5px}
@@ -722,7 +723,7 @@ function renderConnexion() { const o = document.getElementById('x-out');
     : '<div class="card"><p class="big">Bonjour.</p><label for="c-mail">Ton adresse mail<input id="c-mail" type="email" autocomplete="email"></label>' + (cloudMsg ? '<p class="err">' + esc(cloudMsg) + '</p>' : '') + '<button type="button" class="btn go" data-lien="1">Recevoir mon lien</button><p class="grey">Tu reçois un mail avec un lien. Pas de mot de passe.</p></div>'; }
 document.getElementById('x-out').addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d || !d.lien || !sb) return;
   const email = txt('c-mail').trim(); if (!/^\S+@\S+\.\S+$/.test(email)) { cloudMsg = 'Écris ton adresse mail.'; renderConnexion(); return; }
-  sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false, emailRedirectTo: location.origin + location.pathname } }).then(({ error }) => { if (error) cloudMsg = 'Adresse inconnue ou pas de connexion.'; else { lienEnvoye = true; cloudMsg = ''; } renderConnexion(); }); });
+  sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: location.origin + location.pathname } }).then(({ error }) => { if (error) cloudMsg = 'Adresse inconnue ou pas de connexion.'; else { lienEnvoye = true; cloudMsg = ''; } renderConnexion(); }); });
 async function demarrerCloud() {
   try { sb = globalThis.__SB_TEST || (await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')).createClient(SB.url, SB.cle);
     sb.auth.onAuthStateChange((_e, s) => { session = s; setTimeout(() => { if (!s) { pret = false; toutRendre(); return; } charger().catch((e) => { pret = false; cloudMsg = e.message; }).finally(toutRendre); }, 0); });
