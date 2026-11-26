@@ -15,7 +15,7 @@ body{margin:0;min-height:100vh;background:linear-gradient(180deg,#d3d9df,#f1f3f5
 main{max-width:460px;margin:0 auto;padding:24px 20px 60px;display:flex;flex-direction:column;gap:16px}
 h1{font-family:Doto,Inter,sans-serif;font-weight:900;font-size:32px;margin:0;letter-spacing:.5px}
 .app{font-size:14px;color:#464c54;margin:0;letter-spacing:1px;text-transform:uppercase}
-.card{border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.6);box-shadow:0 8px 24px rgba(20,24,29,.10);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card{border:1px solid rgba(255,255,255,.95);background:linear-gradient(180deg,rgba(255,255,255,.82),rgba(255,255,255,.5));box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 2px 4px rgba(20,24,29,.06),0 18px 36px -12px rgba(20,24,29,.22);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
 .big{font-size:26px;font-weight:700;margin:0}
 .grey{color:#464c54;font-size:15px;margin:0}
 details{border-top:1px solid rgba(20,24,29,.10);padding-top:10px}
@@ -24,29 +24,36 @@ summary{display:flex;justify-content:space-between;gap:12px;cursor:pointer;list-
 summary::-webkit-details-marker{display:none}
 summary b{white-space:nowrap}
 .why{font-size:15px;color:#464c54;margin:6px 0 4px}
-.dot{width:26px;height:26px;border-radius:50%;flex:none}
+.sig{flex:none;width:44px;height:44px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#fff,#e3e7eb);color:#14181d;border:1px solid rgba(255,255,255,.95);box-shadow:0 1px 0 #fff inset,0 -2px 0 rgba(20,24,29,.08) inset,0 6px 12px rgba(20,24,29,.18)}
+.sig svg{width:26px;height:26px;fill:currentColor}
+.sig-ok{background:linear-gradient(180deg,#39414b,#14181d);color:#fff;border-color:#14181d;box-shadow:0 1px 0 rgba(255,255,255,.3) inset,0 6px 12px rgba(20,24,29,.3)}
+.sig-non{color:#8a9099}
+.sig.p{width:26px;height:26px;border-radius:9px}
+.sig.p svg{width:16px;height:16px}
 .row{display:flex;align-items:center;gap:12px}
 .stepper{display:flex;align-items:center;gap:10px}
 .stepper button{width:56px;height:56px;border-radius:18px;border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.7);font-size:28px;font-weight:700;color:#14181d;cursor:pointer}
 input{font:700 22px Inter,system-ui,sans-serif;color:#14181d;border:1px solid rgba(20,24,29,.25);border-radius:14px;padding:10px 12px;width:100%;min-height:52px;background:#fff}
 label{display:flex;flex-direction:column;gap:4px;font-size:15px;color:#464c54}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.alert{background:#fde8e6;border-color:#b91c1c}
+.alert{border-color:#14181d;border-width:2px}
 .tag{font-size:12px;border-radius:999px;padding:2px 8px;background:#e6eaee;color:#464c54;white-space:nowrap}
-.tag.ok{background:#dff1e4;color:#165c2d}
+.tag.ok{background:#14181d;color:#fff}
 nav{display:flex;gap:8px}
 nav a{flex:1;text-align:center;min-height:48px;display:flex;align-items:center;justify-content:center;border-radius:16px;border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.45);color:#14181d;font-weight:700;text-decoration:none}
 nav a.on{background:#14181d0d;border-color:#14181d}
 section{display:flex;flex-direction:column;gap:16px}
 section[hidden]{display:none}
 .btn{min-height:56px;border-radius:18px;border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.7);font:700 18px Inter,system-ui,sans-serif;color:#14181d;cursor:pointer;padding:8px 12px}
-.btn.go{background:#1e7a3c;color:#fff;border-color:#1e7a3c;min-height:64px;font-size:20px}
+.btn{box-shadow:0 1px 0 #fff inset,0 -2px 0 rgba(20,24,29,.06) inset,0 6px 14px -6px rgba(20,24,29,.25)}
+.btn:active,a.go:active,a.sec:active{transform:translateY(2px);box-shadow:none}
+.btn.go{background:linear-gradient(180deg,#39414b,#14181d);color:#fff;border-color:#14181d;min-height:64px;font-size:20px;box-shadow:0 1px 0 rgba(255,255,255,.3) inset,0 12px 22px -8px rgba(20,24,29,.55)}
 .err{color:#b91c1c;font-weight:700;margin:0}
 .art{border-top:1px solid rgba(20,24,29,.10);padding-top:10px;display:flex;flex-direction:column;gap:8px}
 .art:first-of-type{border-top:0;padding-top:0}
 textarea{width:100%;min-height:120px;font:13px ui-monospace,monospace;border-radius:12px;border:1px solid rgba(20,24,29,.25);padding:8px}
 .bar{height:14px;border-radius:999px;background:rgba(20,24,29,.10);overflow:hidden}
-.bar div{height:100%;background:#1e7a3c}
+.bar div{height:100%;background:#14181d}
 a.tile{display:flex;justify-content:space-between;align-items:center;gap:12px;text-decoration:none;color:#14181d}
 a.tile b{font-size:22px}
 a.ext{color:#14181d;font-weight:700}
@@ -67,14 +74,28 @@ a.ext{color:#14181d;font-weight:700}
 .navb button{flex:none;width:56px;height:56px;border-radius:18px;border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.7);font-size:26px;font-weight:700;color:#14181d;cursor:pointer}
 .navb p{flex:1;text-align:center}
 a.go,a.sec{display:flex;align-items:center;justify-content:center;border-radius:18px;font-weight:700;text-decoration:none}
-a.go{min-height:62px;background:#1e7a3c;color:#fff;font-size:19px}
+a.go{min-height:62px;background:linear-gradient(180deg,#39414b,#14181d);color:#fff;font-size:19px;box-shadow:0 1px 0 rgba(255,255,255,.3) inset,0 12px 22px -8px rgba(20,24,29,.55)}
 a.sec{min-height:52px;border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.75);color:#14181d;font-size:17px}
 .pills{display:flex;gap:8px}
 .pills a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:56px;justify-content:center;border-radius:16px;border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.5);color:#14181d;text-decoration:none;font-size:13px}
 .pills a b{font-size:17px}
 .btn.sel{border-color:#14181d;background:#14181d0d}
 .msg{background:#fff;border-radius:14px;padding:12px;font-size:17px;border:1px solid rgba(20,24,29,.15)}
-@media (prefers-reduced-motion:reduce){.swing{animation:none}.ring{transition:none}}
+.vie{display:inline-flex;gap:4px;vertical-align:middle;margin-right:8px}
+.vie i{width:7px;height:7px;border-radius:50%;background:#14181d;animation:vie 1.4s ease-in-out infinite}
+.vie i:nth-child(2){animation-delay:.2s}.vie i:nth-child(3){animation-delay:.4s}
+@keyframes vie{0%,100%{opacity:.2;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+.map{height:340px;border-radius:22px;border:1px solid rgba(255,255,255,.95);box-shadow:0 18px 36px -12px rgba(20,24,29,.3);overflow:hidden;background:#e3e7eb;z-index:0}
+.mk{width:18px;height:18px;border-radius:50%;background:linear-gradient(180deg,#fff,#dfe3e7);border:2px solid #14181d;box-shadow:0 4px 8px rgba(20,24,29,.35)}
+.mk.evt{border-radius:4px;transform:rotate(45deg)}
+.mk.vu{background:#14181d}
+.mk.sel{outline:4px solid rgba(20,24,29,.25);outline-offset:2px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px}
+.chips .btn{min-height:48px;white-space:nowrap;font-size:15px;flex:none}
+.lg{display:flex;justify-content:space-between;gap:12px;align-items:center}
+button.lieu{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;min-height:56px;font-size:16px}
+button.lieu span{font-weight:400;font-size:14px;color:#464c54}
+@media (prefers-reduced-motion:reduce){.swing{animation:none}.ring{transition:none}.vie i{animation:none;opacity:.7}}
 .op .adm{display:none!important}
 body.attente main{opacity:.6;pointer-events:none}
 </style>
@@ -82,7 +103,7 @@ body.attente main{opacity:.6;pointer-events:none}
 <body>
 <main>
 <p class="app">Les Dionysiades</p>
-<nav id="nav"><a href="#aujourdhui" id="n-aujourdhui">Accueil</a><a href="#journal" id="n-journal">Journal</a><a href="#argent" id="n-argent" class="adm-nav">Et si…</a></nav>
+<nav id="nav"><a href="#aujourdhui" id="n-aujourdhui">Accueil</a><a href="#carte" id="n-carte">Carte</a><a href="#journal" id="n-journal">Journal</a><a href="#argent" id="n-argent" class="adm-nav">Et si…</a></nav>
 <section id="v-connexion" hidden><h1>Les Dionysiades</h1><div id="x-out"></div></section>
 <section id="v-aujourdhui"><p class="coach" id="coach" aria-live="polite"></p>
 <div class="scene" id="scene" role="group" aria-label="Portant tournant : les articles à chercher"><div class="rail"></div><div class="ring" id="ring"></div><div class="floor"></div></div>
@@ -92,6 +113,7 @@ body.attente main{opacity:.6;pointer-events:none}
 <section id="v-annonce" hidden><h1>Une annonce</h1><div id="n-out"></div><a class="ext" href="#aujourdhui">Retour</a></section>
 <section id="v-releve" hidden><h1>Relevé du jour</h1><div id="r-out"></div><a class="ext" href="#aujourdhui">Retour</a></section>
 <section id="v-chercher" hidden><h1>À chercher</h1><div id="c-out"></div><a class="ext" href="#aujourdhui">Retour</a></section>
+<section id="v-carte" hidden><h1>Où acheter</h1><div id="k-top"></div><div id="k-map" class="map" role="application" aria-label="Carte des lieux où acheter"></div><div id="k-out"></div></section>
 <section id="v-journal" hidden><h1>Mon journal</h1><div id="j-out"></div></section>
 <section id="v-argent" hidden><h1>Ton argent</h1>
 <div class="card">
@@ -246,6 +268,33 @@ let config = {
       "valeur": 40,
       "hypothese": true,
       "note": "au-delà, l'offre est souvent refusée ou impossible"
+    },
+    "pepite_roi_min_pct": {
+      "valeur": 300,
+      "hypothese": true,
+      "note": "au-dessus du budget idéal, on n'accepte que si la mise est au moins quadruplée"
+    }
+  },
+  "carte": {
+    "budget_evenement_pct": {
+      "valeur": 40,
+      "hypothese": true,
+      "note": "vide-greniers et braderies : prix les plus bas, à vérifier sur ses premières sorties"
+    },
+    "budget_solidaire_pct": {
+      "valeur": 30,
+      "hypothese": true,
+      "note": "boutiques solidaires : petits prix, à vérifier"
+    },
+    "budget_bebe_pct": {
+      "valeur": 30,
+      "hypothese": true,
+      "note": "bébé et enfant : petits prix, à vérifier"
+    },
+    "budget_friperie_pct": {
+      "valeur": 20,
+      "hypothese": true,
+      "note": "friperies : souvent plus chères, à vérifier"
     }
   }
 };
@@ -325,31 +374,34 @@ const KEY = 'dionysiades-reglages';
 try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s) for (const [k, val] of Object.entries(s)) { const [a, b] = k.split('.'); if (config[a] && config[a][b] && Number.isFinite(val)) config[a][b].valeur = val; } } catch (e) {}
 function save() { try { const s = {}; for (const [, [a, b]] of P) s[a + '.' + b] = config[a][b].valeur; s['depart.capital_total_eur'] = config.depart.capital_total_eur.valeur; localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
 function origine(x) { return x.source ? '<span class="tag ok">Vérifié le ' + x.date.split('-').reverse().join('/') + '</span> ' + esc(x.source) : '<span class="tag">À vérifier</span> ' + esc(x.note || 'Chiffre choisi par prudence, modifiable dans les réglages.'); }
+const SIGNES = { ok: ['Oui', [".......","......#",".....#.","#...#..",".#.#...","..#....","......."]], moyen: ['Avec prudence', [".......",".......",".......","#.#.#.#",".......",".......","......."]], non: ['Non', [".......",".#...#.","..#.#..","...#...","..#.#..",".#...#.","......."]], alerte: ['Attention', ["...#...","...#...","...#...","...#...",".......","...#...","......."]], pepite: ['Pépite', ["...#...","..#.#..",".#...#.","#.....#",".#...#.","..#.#..","...#..."]] };
+const coulScore = (n) => (n >= 70 ? 'ok' : n >= 50 ? 'moyen' : 'non');
+function signe(k, petit) { const [nom, rows] = SIGNES[k] || SIGNES.moyen; return '<span class="sig sig-' + k + (petit ? ' p' : '') + '" role="img" aria-label="' + nom + '"><svg viewBox="0 0 42 42">' + rows.map((r, y) => [...r].map((ch, x) => (ch === '#' ? '<circle cx="' + (3 + x * 6) + '" cy="' + (3 + y * 6) + '" r="2.5"/>' : '')).join('')).join('') + '</svg></span>'; }
 function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 function ligne(nom, montant, pourquoi, src) { return '<details><summary><span>' + nom + '</span><b>' + eur(montant) + '</b></summary><p class="why">' + pourquoi + '</p><p class="why">' + src + '</p></details>'; }
 function render() {
   const out = document.getElementById('out'), c = config, d = c.depart;
   let r;
   try { r = repartitionCapital(c); } catch (e) {
-    out.innerHTML = '<div class="card alert"><div class="row"><div class="dot" style="background:#b91c1c"></div><p class="big">Pas assez pour commencer.</p></div><p>Il ne reste rien pour acheter des articles.</p><p class="grey">Ajoute de l\'argent, ou baisse les trajets et le matériel dans les réglages.</p></div>'; return; }
+    out.innerHTML = '<div class="card alert"><div class="row">' + signe('non') + '<p class="big">Pas assez pour commencer.</p></div><p>Il ne reste rien pour acheter des articles.</p><p class="grey">Ajoute de l\'argent, ou baisse les trajets et le matériel dans les réglages.</p></div>'; return; }
   const a = c.exemple.achat.valeur, v2 = c.exemple.vente.valeur;
   let h = '<div class="card"><p class="grey">Voici où va ton argent. Touche une ligne pour comprendre.</p>'
     + ligne('Pour acheter des articles', r.stock, 'C\'est ce qui reste quand on a mis de côté les trajets, le matériel et l\'argent de secours.', 'Calcul : ' + eur(r.total) + ' − ' + eur(r.transport) + ' − ' + eur(r.materiel) + ' − ' + eur(r.reserve) + (r.creation ? ' − ' + eur(r.creation) : '') + '.')
     + ligne('Pour les trajets', r.transport, d.tickets_premier_cycle.valeur + ' tickets à ' + eur(c.transport.ticket_metro_eur.valeur) + '.', origine(c.transport.ticket_metro_eur))
     + ligne('Pour le matériel', r.materiel, 'Ruban adhésif, mètre, emballages.', origine(d.materiel_eur))
     + ligne('On n\'y touche pas', r.reserve, 'C\'est l\'argent de secours : ' + d.reserve_pct_du_capital.valeur + ' % de ce que tu as.', origine(d.reserve_pct_du_capital)) + '</div>';
-  h += '<div class="card"><div class="row"><div class="dot" style="background:#b91c1c"></div><p class="big">Règle d\'or</p></div><p>Jamais plus de <b>' + eur(r.maxParArticle) + '</b> pour un article.</p><p class="grey">C\'est ' + c.securite.max_pct_du_stock_par_article.valeur + ' % de l\'argent des articles. Un seul mauvais achat ne doit pas tout bloquer.</p></div>';
+  h += '<div class="card"><div class="row">' + signe('alerte') + '<p class="big">Règle d\'or</p></div><p>Dans l\'idéal, pas plus de <b>' + eur(r.maxParArticle) + '</b> par article. Plus, seulement pour une pépite.</p><p class="grey">C\'est ' + c.securite.max_pct_du_stock_par_article.valeur + ' % de l\'argent des articles. Un seul mauvais achat ne doit pas tout bloquer.</p></div>';
   if (a > 0 && v2 > 0) {
     const g = gainArticle({ achat: a, vente: v2 }, c), f = feu({ achat: a, vente: v2, stockTotal: r.stock }, c);
-    const col = { vert: '#1e7a3c', orange: '#b45309', rouge: '#b91c1c' }[f.couleur];
-    h += '<div class="card"><p class="grey">Un exemple</p><p>Tu achètes <b>' + eur(a) + '</b>. Tu vends <b>' + eur(v2) + '</b>.</p><div class="row"><div class="dot" style="background:' + col + '"></div><p class="big">Il te reste ' + eur(g.gain) + '</p></div><p class="grey">' + esc(f.raison) + '</p>'
+    const col = { vert: 'ok', orange: 'moyen', rouge: 'non' }[f.couleur];
+    h += '<div class="card"><p class="grey">Un exemple</p><p>Tu achètes <b>' + eur(a) + '</b>. Tu vends <b>' + eur(v2) + '</b>.</p><div class="row">' + signe(col) + '<p class="big">Il te reste ' + eur(g.gain) + '</p></div><p class="grey">' + esc(f.raison) + '</p>'
       + '<details><summary><span>Pourquoi ?</span><span class="grey">Voir le calcul</span></summary><p class="why">' + eur(v2) + ' − ' + eur(a) + ' (achat) − ' + eur(g.cotisations) + ' (cotisations) − ' + eur(g.fraisVinted) + ' (frais Vinted) − ' + eur(g.emballage) + ' (emballage) = ' + eur(g.gain) + '.</p><p class="why">Cotisations : ' + origine(c.statut.cotisations_pct_du_prix_de_vente) + '</p><p class="why">Frais Vinted : ' + origine(c.vinted.frais_vendeur_pct) + '</p></details>'
       + '<p>Pour vendre ' + eur(v2) + ', paie au maximum <b>' + eur(prixAchatMax({ vente: v2 }, c)) + '</b>.</p></div>';
     if (a <= r.stock) {
       h += '<div class="card"><p class="grey">Si tu achètes ' + bilanCycle({ achat: a, vente: v2 }, c).nb + ' articles comme ça</p>';
       for (const [txt, part] of [['Tu vends tout', 1], ['Tu en vends 7 sur 10', 0.7], ['Tu en vends 4 sur 10', 0.4]]) {
         const b = bilanCycle({ achat: a, vente: v2, partVendue: part }, c), ok = b.resultat >= 0;
-        h += '<details><summary><span class="row"><span class="dot" style="background:' + (ok ? '#1e7a3c' : '#b91c1c') + '"></span>' + txt + '</span><b>' + (ok ? '+ ' : '− ') + eur(Math.abs(b.resultat)) + '</b></summary><p class="why">' + b.vendus + ' articles vendus. Tu as dépensé ' + eur(b.depense) + ' (articles, emballage, trajets). Tu as reçu ' + eur(b.encaisse) + ' après cotisations.</p></details>';
+        h += '<details><summary><span class="row">' + signe(ok ? 'ok' : 'non', 1) + '' + txt + '</span><b>' + (ok ? '+ ' : '− ') + eur(Math.abs(b.resultat)) + '</b></summary><p class="why">' + b.vendus + ' articles vendus. Tu as dépensé ' + eur(b.depense) + ' (articles, emballage, trajets). Tu as reçu ' + eur(b.encaisse) + ' après cotisations.</p></details>';
       }
       h += '<p class="grey">Ce sont des calculs sur un exemple. Ce n\'est pas une promesse.</p></div>';
     }
@@ -411,15 +463,19 @@ function ajouterDepense(etat, { type, montant: m, date, note = '' }) {
   const e = copie(etat); e.depenses.push({ type, montant: montant(m), date: jour(date), note }); return e;
 }
 
-// Achat : refusé si l'argent manque ou si l'article dépasse le maximum (sauf accord de l'Admin : force).
+// Achat : refusé si l'argent manque. Le maximum par article est un budget idéal, dépassable pour une pépite.
 function ajouterAchat(etat, { nom, prix, date, origine, venteEstimee = 0, force = false }, c) {
   if (!nom || !nom.trim()) throw new Error('Il manque le nom de l\'article');
   if (!origine || !origine.trim()) throw new Error('Il manque où tu l\'as acheté');
   const p = montant(prix, 'Prix'), b = bilan(etat, c);
   if (p > b.disponible) throw new Error('Tu n\'as pas assez d\'argent.');
-  if (p > b.maxParArticle && !force) throw new Error('Trop cher. Maximum ' + b.maxParArticle.toFixed(2).replace('.', ',') + ' €.');
+  // Budget idéal = conseil. Au-dessus : seulement une pépite (revente prévue qui laisse au moins le gain demandé), ou l'accord de l'Admin.
+  let pepite = false;
+  if (p > b.maxParArticle && !force) { const v = r2(venteEstimee) || 0, gain = v - p - v * (val(c.statut.cotisations_pct_du_prix_de_vente) + val(c.vinted.frais_vendeur_pct)) / 100 - val(c.securite.emballage_par_article_eur);
+    pepite = v > 0 && gain / p * 100 >= val(c.nego.pepite_roi_min_pct);
+    if (!pepite) throw new Error('Au-dessus de ton budget idéal (' + b.maxParArticle.toFixed(2).replace('.', ',') + ' €). Prends-le seulement si c\'est une pépite : écris le prix de vente prévu.'); }
   const e = copie(etat); e.seq += 1;
-  e.articles.push({ id: e.seq, nom: nom.trim(), statut: 'acheté', dateStatut: jour(date), achat: { prix: p, date, origine: origine.trim(), venteEstimee: r2(venteEstimee) || 0, force }, vente: null });
+  e.articles.push({ id: e.seq, nom: nom.trim(), statut: 'acheté', dateStatut: jour(date), achat: { prix: p, date, origine: origine.trim(), venteEstimee: r2(venteEstimee) || 0, force: force || pepite }, vente: null });
   return e;
 }
 
@@ -456,12 +512,12 @@ function exportCSV(etat) {
 }
 
 const JKEY = 'dionysiades-journal';
-let etat = etatVide(), formulaire = null, erreur = '', csvVisible = false;
+let etat = etatVide(), formulaire = null, erreur = '', csvVisible = false, pre = {};
 try { const s = JSON.parse(localStorage.getItem(JKEY) || 'null'); if (s && Array.isArray(s.articles) && Array.isArray(s.apports) && Array.isArray(s.depenses)) etat = s; } catch (e) {}
 const auj = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 function agir(f) { let nv; try { nv = f(); } catch (e) { erreur = e.message; renderJournal(); return; }
-  if (!CLOUD) { etat = nv; erreur = ''; formulaire = null; try { localStorage.setItem(JKEY, JSON.stringify(etat)); } catch (e) {} renderJournal(); return; }
-  envoyer(ecritures(etat, nv), () => { erreur = ''; formulaire = null; }, (m) => { erreur = m; }); }
+  if (!CLOUD) { etat = nv; erreur = ''; formulaire = null; pre = {}; try { localStorage.setItem(JKEY, JSON.stringify(etat)); } catch (e) {} renderJournal(); return; }
+  envoyer(ecritures(etat, nv), () => { erreur = ''; formulaire = null; pre = {}; }, (m) => { erreur = m; }); }
 const num = (id) => parseFloat((document.getElementById(id) || {}).value);
 const txt = (id) => ((document.getElementById(id) || {}).value || '');
 const FORMS = {
@@ -476,12 +532,12 @@ function renderJournal() {
   if (!etat.apports.length) h += '<div class="card"><p class="big">Commence ici.</p><p>Dis-moi combien tu as mis.</p></div>';
   else {
     const neg = b.disponible <= 0;
-    h += '<div class="card' + (neg ? ' alert' : '') + '"><p class="grey">Tu peux dépenser</p><p class="big">' + eur(Math.max(0, b.disponible)) + '</p><p>Jamais plus de <b>' + eur(b.maxParArticle) + '</b> pour un article.</p>'
+    h += '<div class="card' + (neg ? ' alert' : '') + '"><p class="grey">Tu peux dépenser</p><p class="big">' + eur(Math.max(0, b.disponible)) + '</p><p>Dans l\'idéal, pas plus de <b>' + eur(b.maxParArticle) + '</b> par article.</p><p class="grey">Plus, seulement pour une pépite : un article qui se revend au moins 4 fois son prix.</p>'
       + '<details><summary><span>Pourquoi ?</span><span class="grey">Voir le calcul</span></summary><p class="why">En caisse : ' + eur(b.tresorerie) + '.</p><p class="why">On enlève : ' + eur(b.reserve) + ' (on n\'y touche pas), ' + eur(b.resteTransport) + ' (trajets à venir), ' + eur(b.resteMateriel) + ' (matériel à venir), ' + eur(b.cotisations) + ' (cotisations à payer).</p></details></div>';
-    for (const a of b.dorment) h += '<div class="card"><div class="row"><div class="dot" style="background:#b45309"></div><p><b>' + esc(a.nom) + '</b> ne se vend pas depuis ' + config.securite.jours_avant_alerte_stock.valeur + ' jours. Baisse le prix.</p></div></div>';
+    for (const a of b.dorment) h += '<div class="card"><div class="row">' + signe('alerte') + '<p><b>' + esc(a.nom) + '</b> ne se vend pas depuis ' + config.securite.jours_avant_alerte_stock.valeur + ' jours. Baisse le prix.</p></div></div>';
   }
   if (formulaire) { const f = FORMS[formulaire];
-    h += '<div class="card"><p class="big">' + f.titre + '</p>' + f.champs.map(([id, lab, type]) => '<label for="' + id + '">' + lab + '<input id="' + id + '" type="' + type + '"' + (type === 'number' ? ' inputmode="decimal" min="0" step="0.5"' : '') + '></label>').join('')
+    h += '<div class="card"><p class="big">' + f.titre + '</p>' + f.champs.map(([id, lab, type]) => '<label for="' + id + '">' + lab + '<input id="' + id + '" type="' + type + '"' + (type === 'number' ? ' inputmode="decimal" min="0" step="0.5"' : '') + ' value="' + esc(pre[id] || '') + '"></label>').join('')
       + (erreur ? '<p class="err">' + esc(erreur) + '</p>' : '') + '<button type="button" class="btn go" data-ok="1">C\'est noté</button><button type="button" class="btn" data-form="">Annuler</button></div>';
   } else h += '<div class="grid">' + (etat.apports.length ? (achatsAutorises(faites) ? '<button type="button" class="btn go" data-form="achat" style="grid-column:1/3">J\'ai acheté</button>' : '<p class="grey" style="grid-column:1/3">Les achats s\'ouvrent après tes 4 démarches. Regarde « Aujourd\'hui ».</p>') + '<button type="button" class="btn" data-form="transport">J\'ai payé un trajet</button><button type="button" class="btn" data-form="materiel">Matériel</button>' : '') + '<button type="button" class="btn' + (etat.apports.length ? '' : ' go') + '" data-form="apport" style="grid-column:1/3">J\'ai mis de l\'argent</button></div>' + (erreur ? '<p class="err">' + esc(erreur) + '</p>' : '');
   h += blocCorrection();
@@ -502,8 +558,8 @@ function renderJournal() {
 document.getElementById('j-out').addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d) return;
   if ('suppr' in d) { aSupprimer = d.suppr || null; erreur = ''; renderJournal(); }
   else if (d.ouisuppr && aSupprimer) { const [table, id] = aSupprimer.split(':'); envoyer([{ table, type: 'delete', id: Number(id) }], () => { erreur = ''; }, (m) => { erreur = m; aSupprimer = null; }); }
-  else if ('form' in d) { formulaire = d.form || null; erreur = ''; renderJournal(); }
-  else if (d.ok) agir(FORMS[formulaire].ok);
+  else if ('form' in d) { formulaire = d.form || null; erreur = ''; pre = {}; renderJournal(); }
+  else if (d.ok) { pre = {}; for (const [id] of FORMS[formulaire].champs) pre[id] = txt(id); agir(FORMS[formulaire].ok); }
   else if (d.avancer) agir(() => avancer(etat, +d.avancer, auj()));
   else if (d.vendre) agir(() => vendre(etat, +d.vendre, { prix: num('v' + d.vendre), date: auj() }));
   else if (d.annuler) agir(() => annulerVente(etat, +d.annuler, auj()));
@@ -691,11 +747,11 @@ function renderChercher() {
   const o = document.getElementById('c-out'), b = bilan(etat, config, auj());
   let h = '<p class="grey">Liste du ' + TENDANCES[0].date.split('-').reverse().join('/') + ', corrigée par tes relevés.</p>';
   for (const t of classement(TENDANCES, releves, auj(), config)) {
-    const col = t.score >= 70 ? '#1e7a3c' : t.score >= 50 ? '#b45309' : '#b91c1c';
+    const col = coulScore(t.score);
     let prix = '<p class="grey">Fais le relevé pour connaître le prix.</p>';
     if (t.prixCourant) { let m = prixAchatMax({ vente: t.prixCourant }, config); if (etat.apports.length) m = Math.min(m, b.maxParArticle);
-      prix = m > 0 ? '<p>Se vend autour de <b>' + eur(t.prixCourant) + '</b>. Paie au maximum <b>' + eur(m) + '</b>.</p>' : '<p>Se vend autour de <b>' + eur(t.prixCourant) + '</b>. Trop peu pour gagner : passe.</p>'; }
-    h += '<div class="card"><div class="row"><div class="dot" style="background:' + col + '"></div><p class="big">' + esc(t.nom) + '</p></div><p>' + esc(t.raison) + '.</p>' + prix
+      prix = m > 0 ? '<p>Se vend autour de <b>' + eur(t.prixCourant) + '</b>. Paie dans l\'idéal <b>' + eur(m) + '</b> au plus.</p>' : '<p>Se vend autour de <b>' + eur(t.prixCourant) + '</b>. Trop peu pour gagner : passe.</p>'; }
+    h += '<div class="card"><div class="row">' + signe(col) + '<p class="big">' + esc(t.nom) + '</p></div><p>' + esc(t.raison) + '.</p>' + prix
       + '<details><summary><span>Pourquoi ?</span><span class="grey">Score ' + t.score + ' sur 100</span></summary><p class="why">Score de l\'agent : ' + t.scoreAgent + '. ' + (t.confirme ? 'Tes ' + t.nbReleves + ' relevés le changent de ' + (t.ajustement > 0 ? '+' : '') + t.ajustement + '.' : t.nbReleves ? 'Un relevé : il en faut ' + config.releve.min_releves.valeur + ' pour changer le score.' : 'Pas encore de relevé.') + '</p><p class="why">Confiance : ' + esc(t.confiance) + '. Source : ' + esc(t.source) + '</p></details></div>';
   }
   o.innerHTML = h;
@@ -708,12 +764,14 @@ const ANCIENNETES = ['aujourdhui', 'jours', 'mois'];
 function coutReel(prix, plateforme, port, c) {
   return arr2(plateforme === 'vinted' ? prix * (1 + c.vinted.frais_acheteur_pct.valeur / 100) + c.vinted.frais_acheteur_fixe_eur.valeur + port : prix + port);
 }
-function analyserAnnonce({ prix, port = 0, plateforme = 'vinted', anciennete = 'jours', revente, maxParArticle = null }, c, gainArticle) {
+function analyserAnnonce({ prix, port = 0, plateforme = 'vinted', anciennete = 'jours', revente, maxParArticle = null, disponible = null }, c, gainArticle) {
   for (const [n, v] of [['Prix', prix], ['Prix de revente', revente]]) if (!Number.isFinite(v) || v <= 0) throw new Error(n + ' : écris un nombre');
   if (!Number.isFinite(port) || port < 0) throw new Error('Frais de port : écris un nombre');
   if (!ANCIENNETES.includes(anciennete)) throw new Error('Choisis depuis quand l\'annonce est en ligne');
   const g = (p) => gainArticle({ achat: coutReel(p, plateforme, port, c), vente: revente }, c);
-  const vert = (p) => { const x = g(p); return x.gain >= c.feux.vert_gain_min_eur.valeur && x.roiPct >= c.feux.vert_roi_min_pct.valeur && (maxParArticle === null || coutReel(p, plateforme, port, c) <= maxParArticle); };
+  // Budget idéal = conseil. On peut le dépasser pour une pépite (mise au moins quadruplée), jamais au-delà de l'argent disponible.
+  const pepite = (p) => { const k = coutReel(p, plateforme, port, c); return maxParArticle !== null && k > maxParArticle && g(p).roiPct >= c.nego.pepite_roi_min_pct.valeur && (disponible === null || k <= disponible); };
+  const vert = (p) => { const x = g(p); return x.gain >= c.feux.vert_gain_min_eur.valeur && x.roiPct >= c.feux.vert_roi_min_pct.valeur && (maxParArticle === null || coutReel(p, plateforme, port, c) <= maxParArticle || pepite(p)); };
   let prixMax = 0; for (let p = 0.5; p <= prix + 1e-9; p = arr2(p + 0.5)) if (vert(p)) prixMax = p;
   const remise = c.nego['remise_' + anciennete + '_pct'].valeur, plancher = prix * (1 - c.nego.remise_max_pct.valeur / 100);
   const souhait = Math.max(0.5, bas50(prix * (1 - remise / 100)));
@@ -722,8 +780,9 @@ function analyserAnnonce({ prix, port = 0, plateforme = 'vinted', anciennete = '
   else if (prixMax > 0 && prixMax >= plancher - 1e-9) { verdict = 'negocier'; offre = Math.min(souhait, prixMax); raisons.push('Au prix affiché, tu ne gagnes pas assez.'); if (maxParArticle !== null && coutReel(prix, plateforme, port, c) > maxParArticle) raisons.push('Il dépasse ton maximum par article.'); }
   else { verdict = 'passer'; raisons.push(prixMax > 0 ? 'Il faudrait une trop grosse remise.' : 'Même très négocié, tu ne gagnes pas assez.'); }
   if (plateforme === 'vinted') raisons.push('Vinted ajoute ses frais au prix : je les ai comptés.');
+  const estPepite = offre !== null && (pepite(offre) || (verdict === 'acheter' && pepite(prix))); if (estPepite) raisons.push('C\'est une pépite : même au-dessus de ton budget idéal, ça vaut le coup.');
   const fin = offre === null ? null : g(offre);
-  return { verdict, offre, prixMax, coutAffiche: coutReel(prix, plateforme, port, c), coutOffre: offre === null ? null : coutReel(offre, plateforme, port, c), gainOffre: fin ? fin.gain : null, gainAffiche: g(prix).gain, raisons };
+  return { verdict, offre, prixMax, coutAffiche: coutReel(prix, plateforme, port, c), coutOffre: offre === null ? null : coutReel(offre, plateforme, port, c), gainOffre: fin ? fin.gain : null, gainAffiche: g(prix).gain, pepite: estPepite, raisons };
 }
 const eurTxt = (n) => (Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ',')) + ' €';
 // Message poli, court, honnête : pas de fausse raison, pas de pression.
@@ -742,7 +801,7 @@ const PICTO_DEFAUT = ["..#####..",".#######.","#########","#.#####.#","#.#####.#
 const pictoDe = (nom) => PICTOS[Object.keys(PICTOS).find((k) => nom.startsWith(k))] || PICTO_DEFAUT;
 const svgPicto = (rows) => '<svg aria-hidden="true" width="76" height="76" viewBox="0 0 54 54" fill="#14181d">' + rows.map((r, y) => [...r].map((ch, x) => (ch === '#' ? '<circle cx="' + (3 + x * 6) + '" cy="' + (3 + y * 6) + '" r="2.3"/>' : '')).join('')).join('') + '</svg>';
 const CINTRE = '<svg class="hanger" aria-hidden="true" width="112" height="28" viewBox="0 0 120 30" fill="none" stroke="#14181d" stroke-width="2" stroke-linecap="round" opacity=".7"><path d="M60 2v8M60 10 8 26h104z"/></svg>';
-const coulScore = (s) => (s >= 70 ? '#1e7a3c' : s >= 50 ? '#b45309' : '#b91c1c');
+
 const RAYON = 178; let portant = [], angleP = 0, devant = 0, signature = '', dejaSalue = false;
 const calme = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 function dire(txt) { const c = document.getElementById('coach'); if (c._dit === txt) return; c._dit = txt; if (calme() || typeof setInterval !== 'function' || globalThis.__SB_TEST) { c.textContent = txt; return; } clearInterval(dire.t); let k = 0; c.textContent = ''; dire.t = setInterval(() => { c.textContent = txt.slice(0, ++k); if (k >= txt.length) clearInterval(dire.t); }, 16); }
@@ -753,7 +812,7 @@ function allerA(i) { const n = portant.length; if (!n) return; const d = ((-i * 
 function renderAccueil() {
   portant = classement(TENDANCES, releves, auj(), config); const sig = portant.map((t) => t.nom + t.score).join('|');
   if (sig !== signature) { signature = sig; const pas = 360 / (portant.length || 1);
-    document.getElementById('ring').innerHTML = portant.map((t, i) => '<div class="piece" data-i="' + i + '" style="transform:rotateY(' + i * pas + 'deg) translateZ(' + RAYON + 'px)"><div class="swing" style="animation-delay:' + (-i * 0.6) + 's"><div class="hook"></div>' + CINTRE + '<div class="etq">' + svgPicto(pictoDe(t.nom)) + '<span>' + esc(t.nom) + '</span><div class="dot" style="width:16px;height:16px;background:' + coulScore(t.score) + '"></div></div></div></div>').join('');
+    document.getElementById('ring').innerHTML = portant.map((t, i) => '<div class="piece" data-i="' + i + '" style="transform:rotateY(' + i * pas + 'deg) translateZ(' + RAYON + 'px)"><div class="swing" style="animation-delay:' + (-i * 0.6) + 's"><div class="hook"></div>' + CINTRE + '<div class="etq">' + svgPicto(pictoDe(t.nom)) + '<span>' + esc(t.nom) + '</span>' + signe(coulScore(t.score), 1) + '</div></div></div>').join('');
     angleP = 0; }
   poserPortant(); ficheAccueil(); }
 function ficheAccueil() { const o = document.getElementById('a-out'), t = portant[devant]; if (!t) { o.innerHTML = '<div class="card"><p>Je prépare ta sélection.</p></div>'; return; }
@@ -761,14 +820,14 @@ function ficheAccueil() { const o = document.getElementById('a-out'), t = portan
   document.getElementById('pos').textContent = (devant + 1) + ' sur ' + portant.length;
   dire(!dejaSalue ? 'Voici ce que j\'ai choisi pour toi. Fais tourner.' : t.score >= 70 ? 'Celui-là, cherche-le aujourd\'hui.' : t.score >= 50 ? 'Celui-là, seulement à petit prix.' : 'Celui-là, laisse-le pour l\'instant.'); dejaSalue = true;
   let prix = '<p class="grey">Montre-moi une annonce : je te dis le bon prix.</p>';
-  if (t.prixCourant) { let m = prixAchatMax({ vente: t.prixCourant }, config); if (etat.apports.length) m = Math.min(m, b.maxParArticle); prix = m > 0 ? '<p>Se vend autour de <b>' + eur(t.prixCourant) + '</b>. Paie au maximum <b>' + eur(m) + '</b>.</p>' : '<p>Se vend autour de <b>' + eur(t.prixCourant) + '</b>. Pas assez pour gagner.</p>'; }
+  if (t.prixCourant) { let m = prixAchatMax({ vente: t.prixCourant }, config); if (etat.apports.length) m = Math.min(m, b.maxParArticle); prix = m > 0 ? '<p>Se vend autour de <b>' + eur(t.prixCourant) + '</b>. Paie dans l\'idéal <b>' + eur(m) + '</b> au plus.</p>' : '<p>Se vend autour de <b>' + eur(t.prixCourant) + '</b>. Pas assez pour gagner.</p>'; }
   const q = encodeURIComponent(t.recherche || t.nom);
-  let h = '<div class="card"><div class="row"><div class="dot" style="background:' + coulScore(t.score) + '"></div><p class="big">' + esc(t.nom) + '</p></div><p>' + esc(t.raison) + '.</p>' + prix
-    + (t.score >= 50 ? '<button type="button" class="btn go" data-annonce="' + devant + '">J\'ai trouvé une annonce</button><div class="grid"><a class="sec" target="_blank" rel="noopener" href="https://www.vinted.fr/catalog?order=newest_first&search_text=' + q + '">Voir sur Vinted</a><a class="sec" target="_blank" rel="noopener" href="https://www.leboncoin.fr/recherche?locations=Paris&sort=time&text=' + q + '">Leboncoin</a></div>' : '<p class="grey">Trop cher ou trop gros pour toi en ce moment.</p>')
+  let h = '<div class="card"><div class="row">' + signe(coulScore(t.score)) + '<p class="big">' + esc(t.nom) + '</p></div><p>' + esc(t.raison) + '.</p>' + prix
+    + (t.score >= 50 ? '<a class="go" href="#carte">Où l\'acheter près de moi</a><button type="button" class="btn" data-annonce="' + devant + '">J\'ai trouvé une annonce</button><p class="grey">En ligne : <a class="ext" target="_blank" rel="noopener" href="https://www.leboncoin.fr/recherche?locations=Paris&sort=time&text=' + q + '">Leboncoin</a> · <a class="ext" target="_blank" rel="noopener" href="https://www.vinted.fr/catalog?order=newest_first&search_text=' + q + '">Vinted</a></p>' : '<p class="grey">Trop cher ou trop gros pour toi en ce moment.</p>')
     + (ouvert ? '' : '<p class="grey">Tu peux regarder. Pour acheter, finis d\'abord <a class="ext" href="#plan">tes étapes</a>.</p>')
     + '<details><summary><span>Pourquoi ?</span><span class="grey">Score ' + t.score + ' sur 100</span></summary><p class="why">Score de l\'agent : ' + t.scoreAgent + '. ' + (t.confirme ? 'Tes relevés le changent de ' + (t.ajustement > 0 ? '+' : '') + t.ajustement + '.' : 'Pas encore confirmé par tes relevés.') + '</p><p class="why">Confiance : ' + esc(t.confiance) + '. Source : ' + esc(t.source) + '</p></details></div>';
   const aExp = etat.articles.filter((a) => a.statut === 'vendu').length, aPub = etat.articles.filter((a) => ['acheté', 'récupéré', 'photographié'].includes(a.statut)).length, sem = releves.filter((r) => (Date.parse(auj()) - Date.parse(r.date)) / 864e5 < 7).length;
-  h += '<div class="card"><p class="grey">Je travaille pour toi</p><p>Dernière analyse : <b>' + TENDANCES[0].date.split('-').reverse().join('/') + '</b>. ' + TENDANCES.length + ' familles classées.</p><p class="grey">' + sem + ' relevé' + (sem > 1 ? 's' : '') + ' de ta part cette semaine. ' + (faitAujourdhui(releves, auj()) ? 'Celui du jour est fait.' : '<a class="ext" href="#releve">Faire celui du jour</a>') + '</p></div>';
+  h += '<div class="card"><p class="grey"><span class="vie" aria-hidden="true"><i></i><i></i><i></i></span>Je travaille pour toi</p><p>Dernière analyse : <b>' + TENDANCES[0].date.split('-').reverse().join('/') + '</b>. ' + TENDANCES.length + ' familles classées.</p><p class="grey">' + sem + ' relevé' + (sem > 1 ? 's' : '') + ' de ta part cette semaine. ' + (faitAujourdhui(releves, auj()) ? 'Celui du jour est fait.' : '<a class="ext" href="#releve">Faire celui du jour</a>') + '</p></div>';
   h += '<div class="pills"><a href="#plan"><b>' + av.faites + '/' + av.total + '</b>Étapes</a><a href="#journal"><b>' + aExp + '</b>À expédier</a><a href="#journal"><b>' + aPub + '</b>À publier</a><a href="#journal"><b>' + (ouvert ? Math.max(0, Math.floor(b.disponible)) + ' €' : '—') + '</b>À dépenser</a></div>';
   o.innerHTML = h; }
 document.getElementById('prev').addEventListener('click', () => allerA((devant - 1 + portant.length) % portant.length));
@@ -792,8 +851,8 @@ function renderAnnonce() { const o = document.getElementById('n-out');
   let h = '<div class="card">' + champ('nom', 'C\'est quoi ?', 'text') + '<p class="grey">Sur quel site ?</p>' + choix('plateforme', PLATS) + champ('prix', 'Prix affiché (€)', 'number') + champ('port', 'Frais de port (€)', 'number', 'Laisse vide si tu vas le chercher.')
     + '<p class="grey">L\'annonce est en ligne depuis…</p>' + choix('anciennete', ANCS) + champ('revente', 'Tu le revends combien ? (€)', 'number', 'Je le remplis seul quand tu as fait des relevés.') + champ('lien', 'Lien de l\'annonce (facultatif)', 'url')
     + (annErr ? '<p class="err">' + esc(annErr) + '</p>' : '') + '<button type="button" class="btn go" data-analyse="1">Dis-moi quoi faire</button></div>';
-  if (annRes) { const r = annRes, col = { acheter: '#1e7a3c', negocier: '#b45309', passer: '#b91c1c' }[r.verdict], mot = { acheter: 'ACHÈTE', negocier: 'NÉGOCIE', passer: 'PASSE' }[r.verdict], l = lienSur(ann.lien);
-    h += '<div class="card"><div class="row"><div class="dot" style="background:' + col + '"></div><p class="big">' + mot + '</p></div>' + r.raisons.map((x) => '<p>' + esc(x) + '</p>').join('');
+  if (annRes) { const r = annRes, col = r.pepite ? 'pepite' : { acheter: 'ok', negocier: 'moyen', passer: 'non' }[r.verdict], mot = r.pepite ? 'PÉPITE' : { acheter: 'ACHÈTE', negocier: 'NÉGOCIE', passer: 'PASSE' }[r.verdict], l = lienSur(ann.lien);
+    h += '<div class="card"><div class="row">' + signe(col) + '<p class="big">' + mot + '</p></div>' + r.raisons.map((x) => '<p>' + esc(x) + '</p>').join('');
     if (r.offre !== null) { const msg = messageOffre({ nom: ann.nom, offre: r.offre, anciennete: ann.anciennete, verdict: r.verdict });
       h += '<div class="row" style="justify-content:space-between"><span>Propose</span><b class="big">' + eur(r.offre) + '</b></div><div class="row" style="justify-content:space-between"><span>Ne dépasse pas</span><b>' + eur(r.prixMax) + '</b></div><div class="row" style="justify-content:space-between"><span>Il te coûtera en tout</span><b>' + eur(r.coutOffre) + '</b></div><div class="row" style="justify-content:space-between"><span>Tu gagnes environ</span><b>' + eur(r.gainOffre) + '</b></div>'
         + '<p class="grey">Ton message, prêt à envoyer</p><p class="msg" id="an-msg">' + esc(msg) + '</p><button type="button" class="btn go" data-copier="1">' + (annCopie ? 'Copié !' : 'Copier le message') + '</button>' + (l ? '<a class="sec" target="_blank" rel="noopener" href="' + esc(l) + '">Ouvrir l\'annonce</a>' : '') + '<p class="grey">Colle le message dans le site, puis envoie.</p>'; }
@@ -803,19 +862,116 @@ document.getElementById('n-out').addEventListener('click', (ev) => { const d = (
   if (d.plateforme) { ann.plateforme = d.plateforme; annRes = null; }
   else if (d.anciennete) { ann.anciennete = d.anciennete; annRes = null; }
   else if (d.analyse) { annCopie = false; try { const b = bilan(etat, config, auj()); if (!ann.nom.trim()) throw new Error('Dis-moi ce que c\'est.');
-      annRes = analyserAnnonce({ prix: parseFloat(ann.prix), port: ann.port.trim() === '' ? 0 : parseFloat(ann.port), plateforme: ann.plateforme === 'vinted' ? 'vinted' : 'autre', anciennete: ann.anciennete, revente: parseFloat(ann.revente), maxParArticle: etat.apports.length ? b.maxParArticle : null }, config, gainArticle); annErr = ''; } catch (e) { annRes = null; annErr = e.message; } }
+      annRes = analyserAnnonce({ prix: parseFloat(ann.prix), port: ann.port.trim() === '' ? 0 : parseFloat(ann.port), plateforme: ann.plateforme === 'vinted' ? 'vinted' : 'autre', anciennete: ann.anciennete, revente: parseFloat(ann.revente), maxParArticle: etat.apports.length ? b.maxParArticle : null, disponible: etat.apports.length ? b.disponible : null }, config, gainArticle); annErr = ''; } catch (e) { annRes = null; annErr = e.message; } }
   else if (d.copier) { const m = document.getElementById('an-msg'); try { navigator.clipboard.writeText(m ? m.textContent : '').then(() => { annCopie = true; renderAnnonce(); }).catch(() => {}); } catch (e) {} return; }
   else return;
   renderAnnonce(); });
 // Partage Android : une annonce partagée vers l'application arrive ici, déjà remplie.
 (() => { try { const p = new URLSearchParams(location.search), brut = [p.get('lien'), p.get('texte'), p.get('titre')].filter(Boolean).join(' '); if (!brut) return;
   const m = brut.match(/https:\/\/[^\s"'<>]+/); ann = { ...ANN0, lien: m ? m[0] : '', nom: (p.get('titre') || '').slice(0, 80), plateforme: /leboncoin/i.test(brut) ? 'leboncoin' : /vinted/i.test(brut) ? 'vinted' : 'autre' }; location.hash = '#annonce'; } catch (e) {} })();
-function vue() { const N = ['aujourdhui', 'journal', 'argent', 'releve', 'chercher', 'plan', 'annonce'];
+// ---------- Carte : où acheter en vrai ----------
+// Carte : où acheter en vrai. Données ouvertes (OpenStreetMap, « Que faire à Paris »), mises en forme ici.
+const GENRES = { friperie: 'Friperie', solidaire: 'Boutique solidaire', bebe: 'Bébé et enfant', evenement: 'Vide-grenier, braderie' };
+const REQUETE_OSM = '[out:json][timeout:25];(nwr["shop"~"second_hand|charity"](48.80,2.22,48.91,2.47);nwr["shop"="clothes"]["second_hand"="only"](48.80,2.22,48.91,2.47););out center tags 500;';
+const BEBE = /b[ée]b[ée]|enfant|kid|baby|pu[ée]ricult|junior|petit/i;
+function lieuxDepuisOSM(elements) {
+  const vus = new Set(), out = [];
+  for (const e of elements || []) { const t = e.tags || {}, lat = e.lat ?? (e.center && e.center.lat), lon = e.lon ?? (e.center && e.center.lon), nom = (t.name || '').trim();
+    if (!nom || !Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+    const cle = nom.toLowerCase() + '|' + lat.toFixed(4) + '|' + lon.toFixed(4); if (vus.has(cle)) continue; vus.add(cle);
+    const adresse = [t['addr:housenumber'], t['addr:street']].filter(Boolean).join(' ') + (t['addr:postcode'] ? (t['addr:street'] ? ', ' : '') + t['addr:postcode'] : '');
+    out.push({ id: 'osm/' + e.type + '/' + e.id, nom, genre: BEBE.test(nom + ' ' + (t.clothes || '') + ' ' + (t.description || '')) ? 'bebe' : t.shop === 'charity' ? 'solidaire' : 'friperie', adresse: adresse.trim(), lat, lon }); }
+  return out.sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
+}
+const EVT = /vide[- ]?grenier|brocante|braderie|puces|vide[- ]?dressing|troc/i;
+function evenementsDepuisParis(resultats, aujourdhui) {
+  const out = [];
+  for (const r of resultats || []) { const ll = r.lat_lon || {}, fin = (r.date_end || r.date_start || '').slice(0, 10), deb = (r.date_start || '').slice(0, 10);
+    if (!r.title || !EVT.test(r.title) || !Number.isFinite(ll.lat) || !Number.isFinite(ll.lon) || !fin || fin < aujourdhui) continue;
+    const fr = (d) => d.split('-').reverse().slice(0, 2).join('/');
+    out.push({ id: 'evt/' + r.id, nom: r.title.trim(), genre: 'evenement', adresse: [r.address_name, r.address_street, r.address_zipcode].filter(Boolean).join(', '), lat: ll.lat, lon: ll.lon, debut: deb, fin, quand: deb && deb !== fin ? 'Du ' + fr(deb) + ' au ' + fr(fin) : 'Le ' + fr(fin), url: /^https:\/\/[^\s"'<>]+$/.test(r.url || '') ? r.url : null }); }
+  return out.sort((a, b) => (a.debut < b.debut ? -1 : 1));
+}
+const filtrerLieux = (lieux, filtre) => (filtre === 'tout' ? lieux : lieux.filter((l) => l.genre === filtre));
+// Combien emporter pour une sortie : une part de l'argent disponible selon le type de lieu, jamais l'argent de secours.
+function budgetVisite(disponible, maxParArticle, c, genre = 'friperie') {
+  const pct = (c.carte['budget_' + genre + '_pct'] || c.carte.budget_friperie_pct).valeur, dispo = Math.max(0, disponible), emporter = Math.floor(dispo * pct / 100);
+  return { emporter, ideal: Math.round(maxParArticle * 100) / 100, articles: maxParArticle > 0 ? Math.floor(emporter / maxParArticle) : 0 };
+}
+const rad = (d) => d * Math.PI / 180;
+function distanceKm(a, b) { const dLat = rad(b.lat - a.lat), dLon = rad(b.lon - a.lon), h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon / 2) ** 2; return Math.round(12742 * Math.asin(Math.sqrt(h)) * 10) / 10; }
+
+const CKEY = 'dionysiades-lieux', VKEY = 'dionysiades-visites';
+let lieux = [], lieuxDate = '', carteEtat = 'vide', filtre = 'tout', choisi = null, visites = [], moi = null, carteMsg = '', carteL = null, coucheL = null;
+try { const v = JSON.parse(localStorage.getItem(VKEY) || 'null'); if (Array.isArray(v)) visites = v; } catch (e) {}
+const jourFr = (d) => d.split('-').reverse().join('/');
+async function chargerLieux() { if (carteEtat === 'charge' || carteEtat === 'ok') return; carteEtat = 'charge'; let vieux = null;
+  try { const c = JSON.parse(localStorage.getItem(CKEY) || 'null'); if (c && Array.isArray(c.lieux) && c.lieux.length) { vieux = c; if (c.date === auj()) { lieux = c.lieux; lieuxDate = c.date; carteEtat = 'ok'; return; } } } catch (e) {}
+  const lire = (u, o) => fetch(u, o).then((r) => { if (!r.ok) throw new Error('x'); return r.json(); });
+  const w = '(search(title,"vide-grenier") or search(title,"brocante") or search(title,"braderie") or search(title,"vide-dressing")) and date_end>=date\'' + auj() + '\'';
+  const [a, b] = await Promise.allSettled([lire('https://overpass-api.de/api/interpreter', { method: 'POST', body: 'data=' + encodeURIComponent(REQUETE_OSM) }).then((j) => lieuxDepuisOSM(j.elements)),
+    lire('https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/que-faire-a-paris-/records?limit=100&where=' + encodeURIComponent(w)).then((j) => evenementsDepuisParis(j.results, auj()))]);
+  const neuf = [...(b.status === 'fulfilled' ? b.value : []), ...(a.status === 'fulfilled' ? a.value : [])];
+  if (a.status === 'fulfilled' && neuf.length) { lieux = neuf; lieuxDate = auj(); carteEtat = 'ok'; carteMsg = b.status === 'fulfilled' ? '' : 'Les vide-greniers ne répondent pas pour l\'instant.'; try { localStorage.setItem(CKEY, JSON.stringify({ date: lieuxDate, lieux })); } catch (e) {} }
+  else if (vieux) { lieux = vieux.lieux; lieuxDate = vieux.date; carteEtat = 'ok'; carteMsg = 'Pas de connexion aux cartes : liste du ' + jourFr(vieux.date) + '.'; }
+  else { carteEtat = 'ko'; carteMsg = 'La carte ne répond pas. Réessaie dans un moment.'; } }
+function chargerLeaflet() { if (globalThis.L) return Promise.resolve(); if (typeof document.createElement !== 'function') return Promise.reject(new Error('x')); if (chargerLeaflet.p) return chargerLeaflet.p;
+  return chargerLeaflet.p = new Promise((ok, ko) => { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(l);
+    const sc = document.createElement('script'); sc.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'; sc.onload = () => ok(); sc.onerror = () => { chargerLeaflet.p = null; ko(new Error('x')); }; document.head.appendChild(sc); }); }
+const dejaVu = (id) => visites.filter((v) => v.lieu_id === id);
+function poserMarqueurs() { if (!globalThis.L) return; const L = globalThis.L;
+  if (!carteL) { carteL = L.map('k-map', { zoomControl: true, attributionControl: true }).setView([48.8566, 2.3522], 12);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(carteL); coucheL = L.layerGroup().addTo(carteL); }
+  coucheL.clearLayers();
+  for (const l of filtrerLieux(lieux, filtre)) L.marker([l.lat, l.lon], { title: l.nom, icon: L.divIcon({ className: '', iconSize: [22, 22], iconAnchor: [11, 11], html: '<div class="mk' + (l.genre === 'evenement' ? ' evt' : '') + (dejaVu(l.id).length ? ' vu' : '') + (l.id === choisi ? ' sel' : '') + '"></div>' }) }).on('click', () => { choisi = l.id; renderCarte(); }).addTo(coucheL);
+  if (moi) L.circleMarker([moi.lat, moi.lon], { radius: 8, color: '#14181d', weight: 3, fillColor: '#fff', fillOpacity: 1 }).addTo(coucheL);
+  setTimeout(() => carteL.invalidateSize(), 60); }
+function renderCarte() { const top = document.getElementById('k-top'), o = document.getElementById('k-out'), b = bilan(etat, config, auj()), vus = filtrerLieux(lieux, filtre);
+  if (carteEtat === 'vide') { chargerLieux().then(() => chargerLeaflet().catch(() => { carteMsg = carteMsg || 'La carte ne s\'affiche pas, mais la liste marche.'; })).finally(() => { if (location.hash === '#carte') renderCarte(); }); }
+  let h = '';
+  if (etat.apports.length) { h += '<div class="card"><p class="grey">Pour une sortie, emporte</p>' + ['evenement', 'solidaire', 'bebe', 'friperie'].map((g) => '<div class="lg"><span>' + GENRES[g] + '</span><b>' + Math.round(budgetVisite(b.disponible, b.maxParArticle, config, g).emporter) + ' €</b></div>').join('')
+      + '<p>Dans l\'idéal, pas plus de <b>' + eur(b.maxParArticle) + '</b> par article.</p><details><summary><span>Pourquoi ?</span><span class="grey">Voir</span></summary><p class="why">C\'est une part de ce que tu peux dépenser (' + eur(Math.max(0, b.disponible)) + ') : ' + ['evenement', 'solidaire', 'bebe', 'friperie'].map((g) => config.carte['budget_' + g + '_pct'].valeur + ' % ' + GENRES[g].toLowerCase()).join(', ') + '.</p><p class="why"><span class="tag">À vérifier</span> Ces parts sont un choix de prudence. Cyrille peut les changer.</p><p class="why">Une pépite (revente au moins 4 fois le prix) peut dépasser l\'idéal.</p></details>'
+      + (achatsAutorises(faites) ? '' : '<p class="grey">Tu peux repérer. Pour acheter, finis d\'abord <a class="ext" href="#plan">tes étapes</a>.</p>') + '</div>'; }
+  else h += '<div class="card"><p>Dis-moi d\'abord combien tu as mis : je calcule ton budget de sortie.</p><a class="sec" href="#journal">Ouvrir le journal</a></div>';
+  const nb = (g) => filtrerLieux(lieux, g).length;
+  h += '<div class="chips">' + [['tout', 'Tout'], ['evenement', 'Vide-greniers'], ['solidaire', 'Solidaires'], ['bebe', 'Bébé'], ['friperie', 'Friperies']].map(([g, l]) => '<button type="button" class="btn' + (filtre === g ? ' sel' : '') + '" aria-pressed="' + (filtre === g) + '" data-filtre="' + g + '">' + l + (lieux.length ? ' ' + nb(g) : '') + '</button>').join('') + '</div>';
+  top.innerHTML = h; h = '';
+  if (carteEtat === 'charge' || carteEtat === 'vide') h += '<div class="card"><p><span class="vie" aria-hidden="true"><i></i><i></i><i></i></span>Je cherche les lieux…</p></div>';
+  if (carteMsg) h += '<p class="grey">' + esc(carteMsg) + '</p>';
+  if (carteEtat === 'ko') h += '<button type="button" class="btn" data-recharger="1">Réessayer</button>';
+  const l = lieux.find((x) => x.id === choisi);
+  const ligneLieu = (x) => '<button type="button" class="btn lieu" data-lieu="' + esc(x.id) + '"><b>' + esc(x.nom) + '</b><span>' + esc([x.quand, GENRES[x.genre], moi ? distanceKm(moi, x).toLocaleString('fr-FR') + ' km' : x.adresse].filter(Boolean).join(' · ')) + '</span></button>';
+  if (l) { const v = dejaVu(l.id), ach = etat.articles.filter((a) => a.achat.origine === l.nom), bv = budgetVisite(b.disponible, b.maxParArticle, config, l.genre);
+    h += '<div class="card"><div class="row">' + signe(v.length ? 'ok' : 'moyen') + '<p class="big">' + esc(l.nom) + '</p></div><p class="grey">' + esc([GENRES[l.genre], l.quand, l.adresse].filter(Boolean).join(' · ')) + '</p>'
+      + (etat.apports.length ? '<div class="lg"><span>Emporte</span><b class="big">' + bv.emporter + ' €</b></div>' : '')
+      + (v.length ? '<p>Déjà visité le ' + jourFr(v[v.length - 1].date) + '.' + (ach.length ? ' ' + ach.length + ' article' + (ach.length > 1 ? 's' : '') + ' acheté' + (ach.length > 1 ? 's' : '') + ' ici.' : '') + '</p>' : '')
+      + '<a class="go" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&travelmode=transit&destination=' + l.lat + ',' + l.lon + '">Y aller en transports</a>'
+      + '<div class="grid"><button type="button" class="btn" data-visite="' + esc(l.id) + '">J\'y suis allée</button>' + (achatsAutorises(faites) && etat.apports.length ? '<button type="button" class="btn" data-achatici="' + esc(l.id) + '">J\'ai acheté ici</button>' : '<span></span>') + '</div>'
+      + (l.url ? '<a class="ext" target="_blank" rel="noopener" href="' + esc(l.url) + '">Voir la page de l\'événement</a>' : '') + '<p class="grey">Vérifie les horaires avant de partir.</p></div>'; }
+  if (lieux.length) { h += '<button type="button" class="btn" data-moi="1">' + (moi ? 'Les plus proches de moi' : 'Trouver près de moi') + '</button>';
+    const liste = moi ? vus.slice().sort((x, y) => distanceKm(moi, x) - distanceKm(moi, y)).slice(0, 8) : vus.filter((x) => x.genre === 'evenement').slice(0, 8);
+    if (liste.length) h += '<div class="card"><p class="grey">' + (moi ? 'Les plus proches' : 'Bientôt : vide-greniers et braderies') + '</p>' + liste.map(ligneLieu).join('') + '</div>';
+    else if (!moi && (filtre === 'tout' || filtre === 'evenement')) h += '<p class="grey">Pas de vide-grenier annoncé pour l\'instant.</p>';
+    const mv = [...new Set(visites.map((x) => x.lieu_id))].map((id) => lieux.find((x) => x.id === id)).filter(Boolean);
+    if (mv.length) h += '<div class="card"><p class="grey">Déjà visités</p>' + mv.slice(-8).reverse().map(ligneLieu).join('') + '</div>';
+    h += '<p class="grey">Boutiques : OpenStreetMap. Événements : « Que faire à Paris » (Ville de Paris). Lu le ' + jourFr(lieuxDate) + '. Rond : boutique. Losange : événement. Plein : déjà visité.</p>'; }
+  o.innerHTML = h; poserMarqueurs(); if (l && carteL) carteL.panTo([l.lat, l.lon]); }
+function noterVisite(l) { const ligne = { lieu_id: l.id, lieu_nom: l.nom, genre: l.genre, date: auj() }; if (dejaVu(l.id).some((v) => v.date === ligne.date)) return;
+  if (!CLOUD) { visites.push(ligne); try { localStorage.setItem(VKEY, JSON.stringify(visites)); } catch (e) {} renderCarte(); return; }
+  document.body.classList.add('attente'); Promise.resolve(sb.from('visites').insert(ligne)).then(({ error }) => { if (error) throw new Error('x'); visites.push(ligne); carteMsg = ''; }).catch(() => { carteMsg = 'Visite pas enregistrée. Vérifie ta connexion.'; }).finally(() => { document.body.classList.remove('attente'); renderCarte(); }); }
+for (const z of ['k-top', 'k-out']) document.getElementById(z).addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d) return; const l = lieux.find((x) => x.id === (d.lieu || d.visite || d.achatici));
+  if (d.filtre) { filtre = d.filtre; renderCarte(); }
+  else if (d.lieu && l) { choisi = l.id; renderCarte(); }
+  else if (d.visite && l) noterVisite(l);
+  else if (d.achatici && l) { noterVisite(l); pre = { 'f-ou': l.nom }; formulaire = 'achat'; erreur = ''; location.hash = '#journal'; renderJournal(); if (typeof window.dispatchEvent !== 'function') vue(); }
+  else if (d.recharger) { carteEtat = 'vide'; carteMsg = ''; renderCarte(); }
+  else if (d.moi) { try { navigator.geolocation.getCurrentPosition((p) => { moi = { lat: p.coords.latitude, lon: p.coords.longitude }; carteMsg = ''; renderCarte(); if (carteL) carteL.setView([moi.lat, moi.lon], 14); }, () => { carteMsg = 'Je n\'ai pas le droit de voir où tu es. Autorise la position, ou choisis sur la carte.'; renderCarte(); }, { timeout: 10000 }); } catch (e) { carteMsg = 'La position ne marche pas sur ce téléphone.'; renderCarte(); } } });
+function vue() { const N = ['aujourdhui', 'carte', 'journal', 'argent', 'releve', 'chercher', 'plan', 'annonce'];
   const bloque = CLOUD && !pret; document.getElementById('v-connexion').hidden = !bloque; document.getElementById('nav').hidden = bloque;
   if (bloque) { for (const n of N) document.getElementById('v-' + n).hidden = true; renderConnexion(); return; }
   const h = N.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'aujourdhui';
   for (const n of N) { document.getElementById('v-' + n).hidden = n !== h; const nav = document.getElementById('n-' + n); if (nav) nav.className = n === h ? 'on' : ''; }
-  if (h === 'aujourdhui') renderAccueil(); if (h === 'plan') renderPlan(); if (h === 'annonce') renderAnnonce(); if (h === 'releve') renderReleve(); if (h === 'chercher') renderChercher(); }
+  if (h === 'aujourdhui') renderAccueil(); if (h === 'plan') renderPlan(); if (h === 'annonce') renderAnnonce(); if (h === 'releve') renderReleve(); if (h === 'chercher') renderChercher(); if (h === 'carte') renderCarte(); }
 // ---------- Base de données (Supabase) : seulement quand l'application est à sa vraie adresse ----------
 // Passage entre la base (lignes Supabase) et l'état de l'application. Fonctions pures, testées.
 const n = (x) => (x === null || x === undefined ? null : Number(x));
@@ -879,6 +1035,7 @@ async function charger() {
     ...de.map((x) => ({ table: 'depenses', id: x.id, quoi: lib[x.type] || 'Dépense', montant: Number(x.montant), cree_le: x.cree_le, cree_par: x.cree_par })),
     ...ar.map((x) => ({ table: 'articles', id: x.id, quoi: 'Achat : ' + x.nom, montant: Number(x.achat_prix), cree_le: x.cree_le, cree_par: x.cree_par, statut: x.statut }))].sort((a, b) => (a.cree_le < b.cree_le ? 1 : -1));
   aSupprimer = null;
+  try { const vi = await sb.from('visites').select('*'); if (!vi.error && Array.isArray(vi.data)) visites = vi.data.map((x) => ({ lieu_id: x.lieu_id, lieu_nom: x.lieu_nom, genre: x.genre, date: x.date })); } catch (e) {}
   const t = tendancesRecentes(te); if (t.length) TENDANCES = t;
   const ex = config.exemple; config = configAvecReglages(CONFIG_BASE, rg); config.exemple = ex;
   pret = true; cloudMsg = ''; document.body.classList.toggle('op', role !== 'admin'); document.getElementById('n-argent').hidden = role !== 'admin';
@@ -900,7 +1057,7 @@ function envoyer(ops, ok, ko) { document.body.classList.add('attente');
   return ecrire(ops).then(charger).then(ok).catch((e) => ko(e.message)).finally(() => { document.body.classList.remove('attente'); renderJournal(); renderReleve(); vue(); }); }
 function renderConnexion() { const o = document.getElementById('x-out');
   o.innerHTML = lienEnvoye ? '<div class="card"><p class="big">Regarde tes mails.</p><p>Clique sur le lien dans le mail.</p></div>'
-    : '<div class="card"><p class="big">Bonjour.</p><p>Appuie sur le bouton vert.</p>' + (cloudMsg ? '<p class="err">' + esc(cloudMsg) + '</p>' : '') + '<button type="button" class="btn go" data-google="1">Continuer avec Google</button><p class="grey">Choisis ton compte Google. Pas de mot de passe à retenir.</p></div>'
+    : '<div class="card"><p class="big">Bonjour.</p><p>Appuie sur le bouton.</p>' + (cloudMsg ? '<p class="err">' + esc(cloudMsg) + '</p>' : '') + '<button type="button" class="btn go" data-google="1">Continuer avec Google</button><p class="grey">Choisis ton compte Google. Pas de mot de passe à retenir.</p></div>'
       + '<details class="card"><summary><span>Autre moyen</span><span class="grey">Lien par mail</span></summary><label for="c-mail">Ton adresse mail<input id="c-mail" type="email" autocomplete="email"></label><button type="button" class="btn" data-lien="1">Recevoir mon lien</button><p class="grey">Tu reçois un mail avec un lien. Deux mails par heure au maximum.</p></details>'; }
 document.getElementById('x-out').addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d || !sb) return;
   if (d.google) { sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } }).then(({ error }) => { if (error) { cloudMsg = 'Connexion Google impossible. Réessaie.'; renderConnexion(); } }); return; }
