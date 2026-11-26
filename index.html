@@ -905,16 +905,23 @@ const CKEY = 'dionysiades-lieux', VKEY = 'dionysiades-visites';
 let lieux = [], lieuxDate = '', carteEtat = 'vide', filtre = 'tout', choisi = null, visites = [], moi = null, carteMsg = '', carteL = null, coucheL = null;
 try { const v = JSON.parse(localStorage.getItem(VKEY) || 'null'); if (Array.isArray(v)) visites = v; } catch (e) {}
 const jourFr = (d) => d.split('-').reverse().join('/');
+const OSM_URLS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
+async function lireOSM() { for (const u of OSM_URLS) { try { const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 20000); const r = await fetch(u, { method: 'POST', body: 'data=' + encodeURIComponent(REQUETE_OSM), signal: ctl.signal }); clearTimeout(t); if (!r.ok) continue; const l = lieuxDepuisOSM((await r.json()).elements); if (l.length) return l; } catch (e) {} } throw new Error('x'); }
+// Boutiques : la copie gardée dans la base d'abord (rapide, fiable). OpenStreetMap en direct seulement s'il n'y a pas de copie, ou pour la rafraîchir (Admin, tous les 30 jours).
+async function boutiques() { let copie = null;
+  if (CLOUD && sb) { try { const r = await sb.from('lieux_cache').select('*').eq('id', 1).maybeSingle(); if (!r.error && r.data && Array.isArray(r.data.donnees) && r.data.donnees.length) { copie = { l: r.data.donnees, date: r.data.date }; if (role !== 'admin' || (Date.parse(auj()) - Date.parse(copie.date)) / 864e5 < 30) return copie; } } catch (e) {} }
+  let l; try { l = await lireOSM(); } catch (e) { if (copie) return copie; throw e; }
+  if (CLOUD && sb && role === 'admin') { try { await sb.from('lieux_cache').upsert({ id: 1, date: auj(), donnees: l }); } catch (e) {} }
+  return { l, date: auj() }; }
 async function chargerLieux() { if (carteEtat === 'charge' || carteEtat === 'ok') return; carteEtat = 'charge'; let vieux = null;
-  try { const c = JSON.parse(localStorage.getItem(CKEY) || 'null'); if (c && Array.isArray(c.lieux) && c.lieux.length) { vieux = c; if (c.date === auj()) { lieux = c.lieux; lieuxDate = c.date; carteEtat = 'ok'; return; } } } catch (e) {}
-  const lire = (u, o) => fetch(u, o).then((r) => { if (!r.ok) throw new Error('x'); return r.json(); });
+  try { const c = JSON.parse(localStorage.getItem(CKEY) || 'null'); if (c && Array.isArray(c.lieux) && c.lieux.length) { vieux = c; if (c.date === auj() && c.complet) { lieux = c.lieux; lieuxDate = c.dateBoutiques || c.date; carteEtat = 'ok'; return; } } } catch (e) {}
   const w = '(search(title,"vide-grenier") or search(title,"brocante") or search(title,"braderie") or search(title,"vide-dressing")) and date_end>=date\'' + auj() + '\'';
-  const [a, b] = await Promise.allSettled([lire('https://overpass-api.de/api/interpreter', { method: 'POST', body: 'data=' + encodeURIComponent(REQUETE_OSM) }).then((j) => lieuxDepuisOSM(j.elements)),
-    lire('https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/que-faire-a-paris-/records?limit=100&where=' + encodeURIComponent(w)).then((j) => evenementsDepuisParis(j.results, auj()))]);
-  const neuf = [...(b.status === 'fulfilled' ? b.value : []), ...(a.status === 'fulfilled' ? a.value : [])];
-  if (a.status === 'fulfilled' && neuf.length) { lieux = neuf; lieuxDate = auj(); carteEtat = 'ok'; carteMsg = b.status === 'fulfilled' ? '' : 'Les vide-greniers ne répondent pas pour l\'instant.'; try { localStorage.setItem(CKEY, JSON.stringify({ date: lieuxDate, lieux })); } catch (e) {} }
-  else if (vieux) { lieux = vieux.lieux; lieuxDate = vieux.date; carteEtat = 'ok'; carteMsg = 'Pas de connexion aux cartes : liste du ' + jourFr(vieux.date) + '.'; }
-  else { carteEtat = 'ko'; carteMsg = 'La carte ne répond pas. Réessaie dans un moment.'; } }
+  const [a, b] = await Promise.allSettled([boutiques(), fetch('https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/que-faire-a-paris-/records?limit=100&where=' + encodeURIComponent(w)).then((r) => { if (!r.ok) throw new Error('x'); return r.json(); }).then((j) => evenementsDepuisParis(j.results, auj()))]);
+  const okA = a.status === 'fulfilled', okB = b.status === 'fulfilled', ev = okB ? b.value : [], bo = okA ? a.value.l : vieux ? vieux.lieux.filter((x) => x.genre !== 'evenement') : [];
+  if (!bo.length && !ev.length) { carteEtat = 'ko'; carteMsg = 'La carte ne répond pas. Réessaie dans un moment.'; return; }
+  lieux = [...ev, ...bo]; lieuxDate = okA ? a.value.date : vieux ? (vieux.dateBoutiques || vieux.date) : auj(); carteEtat = 'ok';
+  carteMsg = !okA ? (bo.length ? 'Les boutiques ne répondent pas : liste du ' + jourFr(lieuxDate) + '.' : 'Les boutiques ne répondent pas pour l\'instant. Voici les événements.') : okB ? '' : 'Les vide-greniers ne répondent pas pour l\'instant.';
+  try { localStorage.setItem(CKEY, JSON.stringify({ date: auj(), dateBoutiques: lieuxDate, complet: okA && okB, lieux })); } catch (e) {} }
 function chargerLeaflet() { if (globalThis.L) return Promise.resolve(); if (typeof document.createElement !== 'function') return Promise.reject(new Error('x')); if (chargerLeaflet.p) return chargerLeaflet.p;
   return chargerLeaflet.p = new Promise((ok, ko) => { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(l);
     const sc = document.createElement('script'); sc.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'; sc.onload = () => ok(); sc.onerror = () => { chargerLeaflet.p = null; ko(new Error('x')); }; document.head.appendChild(sc); }); }
@@ -954,7 +961,7 @@ function renderCarte() { const top = document.getElementById('k-top'), o = docum
     else if (!moi && (filtre === 'tout' || filtre === 'evenement')) h += '<p class="grey">Pas de vide-grenier annoncé pour l\'instant.</p>';
     const mv = [...new Set(visites.map((x) => x.lieu_id))].map((id) => lieux.find((x) => x.id === id)).filter(Boolean);
     if (mv.length) h += '<div class="card"><p class="grey">Déjà visités</p>' + mv.slice(-8).reverse().map(ligneLieu).join('') + '</div>';
-    h += '<p class="grey">Boutiques : OpenStreetMap. Événements : « Que faire à Paris » (Ville de Paris). Lu le ' + jourFr(lieuxDate) + '. Rond : boutique. Losange : événement. Plein : déjà visité.</p>'; }
+    h += '<p class="grey">Boutiques : OpenStreetMap. Événements : « Que faire à Paris » (Ville de Paris). Boutiques lues le ' + jourFr(lieuxDate) + '. Rond : boutique. Losange : événement. Plein : déjà visité.</p>'; }
   o.innerHTML = h; poserMarqueurs(); if (l && carteL) carteL.panTo([l.lat, l.lon]); }
 function noterVisite(l) { const ligne = { lieu_id: l.id, lieu_nom: l.nom, genre: l.genre, date: auj() }; if (dejaVu(l.id).some((v) => v.date === ligne.date)) return;
   if (!CLOUD) { visites.push(ligne); try { localStorage.setItem(VKEY, JSON.stringify(visites)); } catch (e) {} renderCarte(); return; }
