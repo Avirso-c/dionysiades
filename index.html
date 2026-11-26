@@ -433,6 +433,7 @@ function renderJournal() {
     h += '<div class="card"><p class="big">' + f.titre + '</p>' + f.champs.map(([id, lab, type]) => '<label for="' + id + '">' + lab + '<input id="' + id + '" type="' + type + '"' + (type === 'number' ? ' inputmode="decimal" min="0" step="0.5"' : '') + '></label>').join('')
       + (erreur ? '<p class="err">' + esc(erreur) + '</p>' : '') + '<button type="button" class="btn go" data-ok="1">C\'est noté</button><button type="button" class="btn" data-form="">Annuler</button></div>';
   } else h += '<div class="grid">' + (etat.apports.length ? (achatsAutorises(faites) ? '<button type="button" class="btn go" data-form="achat" style="grid-column:1/3">J\'ai acheté</button>' : '<p class="grey" style="grid-column:1/3">Les achats s\'ouvrent après tes 4 démarches. Regarde « Aujourd\'hui ».</p>') + '<button type="button" class="btn" data-form="transport">J\'ai payé un trajet</button><button type="button" class="btn" data-form="materiel">Matériel</button>' : '') + '<button type="button" class="btn' + (etat.apports.length ? '' : ' go') + '" data-form="apport" style="grid-column:1/3">J\'ai mis de l\'argent</button></div>' + (erreur ? '<p class="err">' + esc(erreur) + '</p>' : '');
+  h += blocCorrection();
   if (etat.articles.length) { h += '<div class="card"><p class="grey">Mes articles</p>';
     for (const a of etat.articles.slice().reverse()) { const suiv = STATUTS[STATUTS.indexOf(a.statut) + 1];
       h += '<div class="art"><div class="row" style="justify-content:space-between"><b>' + esc(a.nom) + '</b><span class="tag' + (a.statut === 'payé' ? ' ok' : '') + '">' + a.statut + '</span></div><p class="grey">Acheté ' + eur(a.achat.prix) + (a.vente ? ' · vendu ' + eur(a.vente.prix) : '') + '</p>';
@@ -444,11 +445,13 @@ function renderJournal() {
   if (etat.apports.length) h += '<details class="card adm"><summary><b>Tous les chiffres (Admin)</b><span class="grey">Ouvrir</span></summary>'
     + [['Argent mis', b.apports], ['Achats d\'articles', b.achats], ['Trajets, matériel, autres', b.depenses], ['Ventes payées', b.encaisse], ['Ventes à recevoir', b.aRecevoir], ['Cotisations à payer', b.cotisations], ['Frais Vinted', b.fraisVinted], ['En caisse', b.tresorerie], ['Stock pas encore vendu', b.stockImmobilise], ['Bénéfice sur les ventes payées', b.benefice]].map(([l, n]) => '<div class="row" style="justify-content:space-between"><span>' + l + '</span><b>' + (n < 0 ? '− ' : '') + eur(Math.abs(n)) + '</b></div>').join('')
     + '<p class="grey">' + b.nbEnStock + ' en stock · ' + b.nbVendus + ' vendus · erreur moyenne des prix prévus : ' + (b.erreurMoyennePct === null ? 'pas encore de vente' : b.erreurMoyennePct + ' %') + '</p>'
-    + '<button type="button" class="btn" data-csv="1">Copier pour le comptable</button>' + (csvVisible ? '<textarea readonly aria-label="Journal au format CSV">' + esc(exportCSV(etat)) + '</textarea>' : '') + '</details>';
+    + blocSaisiesAdmin() + '<button type="button" class="btn" data-csv="1">Copier pour le comptable</button>' + (csvVisible ? '<textarea readonly aria-label="Journal au format CSV">' + esc(exportCSV(etat)) + '</textarea>' : '') + '</details>';
   o.innerHTML = h;
 }
 document.getElementById('j-out').addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d) return;
-  if ('form' in d) { formulaire = d.form || null; erreur = ''; renderJournal(); }
+  if ('suppr' in d) { aSupprimer = d.suppr || null; erreur = ''; renderJournal(); }
+  else if (d.ouisuppr && aSupprimer) { const [table, id] = aSupprimer.split(':'); envoyer([{ table, type: 'delete', id: Number(id) }], () => { erreur = ''; }, (m) => { erreur = m; aSupprimer = null; }); }
+  else if ('form' in d) { formulaire = d.form || null; erreur = ''; renderJournal(); }
   else if (d.ok) agir(FORMS[formulaire].ok);
   else if (d.avancer) agir(() => avancer(etat, +d.avancer, auj()));
   else if (d.vendre) agir(() => vendre(etat, +d.vendre, { prix: num('v' + d.vendre), date: auj() }));
@@ -699,23 +702,39 @@ function tendancesRecentes(lignes) {
 
 const CLOUD = typeof globalThis.__SB_TEST !== 'undefined' || /\.github\.io$/.test(location.hostname);
 const SB = { url: 'https://vthobytejlzfyedldsha.supabase.co', cle: 'sb_publishable_l_263RKA0dOAfc1dyABeVQ_xq_AHJO1' };
-let sb = null, pret = !CLOUD, role = 'admin', session = null, cloudMsg = '', lienEnvoye = false;
+let sb = null, pret = !CLOUD, role = 'admin', session = null, cloudMsg = '', lienEnvoye = false, saisies = [], aSupprimer = null;
 const toutRendre = () => { renderJournal(); vue(); };
 async function charger() {
   const T = ['apports', 'depenses', 'articles', 'plan_etapes', 'releves', 'tendances', 'reglages'];
   const [m, ...r] = await Promise.all([sb.from('membres').select('role').eq('user_id', session.user.id).maybeSingle(), ...T.map((x) => sb.from(x).select('*'))]);
-  if (m.error || r.some((x) => x.error)) throw new Error('Pas de connexion. Réessaie.');
+  const ko = [m, ...r].find((x) => x.error); if (ko) throw new Error(ko.error.code === '42501' ? 'Accès refusé par la base. Préviens Cyrille.' : 'Pas de connexion. Réessaie.');
   if (!m.data) { pret = false; role = null; cloudMsg = 'Ton compte n\'est pas encore invité. Demande à Cyrille.'; return; }
   const [ap, de, ar, pl, re, te, rg] = r.map((x) => x.data);
   role = m.data.role; etat = etatDepuisLignes({ apports: ap, depenses: de, articles: ar });
   const f = pl.map((x) => x.etape_id); faites = ETAPES.map((e) => e.id).filter((id) => f.includes(id));
   releves = re.map((x) => ({ date: x.date, nom: x.nom, offre: x.offre, interet: x.interet, prix: Number(x.prix) }));
+  const lib = { transport: 'Trajet', materiel: 'Matériel', autre: 'Dépense' };
+  saisies = [...ap.map((x) => ({ table: 'apports', id: x.id, quoi: 'Argent mis', montant: Number(x.montant), cree_le: x.cree_le, cree_par: x.cree_par })),
+    ...de.map((x) => ({ table: 'depenses', id: x.id, quoi: lib[x.type] || 'Dépense', montant: Number(x.montant), cree_le: x.cree_le, cree_par: x.cree_par })),
+    ...ar.map((x) => ({ table: 'articles', id: x.id, quoi: 'Achat : ' + x.nom, montant: Number(x.achat_prix), cree_le: x.cree_le, cree_par: x.cree_par, statut: x.statut }))].sort((a, b) => (a.cree_le < b.cree_le ? 1 : -1));
+  aSupprimer = null;
   const t = tendancesRecentes(te); if (t.length) TENDANCES = t;
   const ex = config.exemple; config = configAvecReglages(CONFIG_BASE, rg); config.exemple = ex;
   pret = true; cloudMsg = ''; document.body.classList.toggle('op', role !== 'admin'); document.getElementById('n-argent').hidden = role !== 'admin';
 }
-async function ecrire(ops) { for (const o of ops) { const q = o.type === 'insert' ? sb.from(o.table).insert(o.ligne) : sb.from(o.table).update(o.ligne).eq('id', o.id);
-  const { error } = await q; if (error) throw new Error('Pas enregistré. Vérifie ta connexion et réessaie.'); } }
+async function ecrire(ops) { for (const o of ops) {
+  if (o.type === 'delete') { const { data, error } = await sb.from(o.table).delete().eq('id', o.id).select('id'); if (error) throw new Error('Pas supprimé. Vérifie ta connexion et réessaie.'); if (!data || !data.length) throw new Error('Trop tard pour corriger. Demande à Cyrille.'); continue; }
+  const q = o.type === 'insert' ? sb.from(o.table).insert(o.ligne) : sb.from(o.table).update(o.ligne).eq('id', o.id);
+  const { error } = await q; if (error) throw new Error(error.code === '42501' ? 'Refusé par la base. Préviens Cyrille.' : 'Pas enregistré. Vérifie ta connexion et réessaie.'); } }
+// Saisie que la personne connectée peut encore corriger elle-même : la sienne, de moins de 10 minutes.
+function corrigeable() { if (!CLOUD || !session) return null; const lim = Date.now() - 10 * 60 * 1000;
+  return saisies.find((s) => s.cree_par === session.user.id && Date.parse(s.cree_le) > lim && (s.table !== 'articles' || s.statut === 'acheté')) || null; }
+const cleS = (s) => s.table + ':' + s.id;
+function blocCorrection() { if (!CLOUD) return ''; let h = ''; const c = corrigeable();
+  if (aSupprimer) { const s = saisies.find((x) => cleS(x) === aSupprimer); if (s) return '<div class="card alert"><p class="big">Supprimer ?</p><p>' + esc(s.quoi) + ' : <b>' + eur(s.montant) + '</b></p><p class="grey">C\'est définitif.</p><button type="button" class="btn" data-ouisuppr="1">Oui, supprimer</button><button type="button" class="btn go" data-suppr="">Non, garder</button></div>'; }
+  if (c) h += '<div class="card"><p class="grey">Ta dernière saisie</p><p>' + esc(c.quoi) + ' : <b>' + eur(c.montant) + '</b></p><button type="button" class="btn" data-suppr="' + cleS(c) + '">Je me suis trompé</button></div>';
+  return h; }
+function blocSaisiesAdmin() { if (!CLOUD || role !== 'admin' || !saisies.length) return ''; return '<p class="grey">Dernières saisies</p>' + saisies.slice(0, 8).map((s) => '<div class="row" style="justify-content:space-between"><span>' + esc(s.quoi) + ' · ' + eur(s.montant) + '</span><button type="button" class="btn" style="min-height:44px" data-suppr="' + cleS(s) + '">Supprimer</button></div>').join(''); }
 function envoyer(ops, ok, ko) { document.body.classList.add('attente');
   return ecrire(ops).then(charger).then(ok).catch((e) => ko(e.message)).finally(() => { document.body.classList.remove('attente'); renderJournal(); renderReleve(); vue(); }); }
 function renderConnexion() { const o = document.getElementById('x-out');
@@ -723,7 +742,7 @@ function renderConnexion() { const o = document.getElementById('x-out');
     : '<div class="card"><p class="big">Bonjour.</p><label for="c-mail">Ton adresse mail<input id="c-mail" type="email" autocomplete="email"></label>' + (cloudMsg ? '<p class="err">' + esc(cloudMsg) + '</p>' : '') + '<button type="button" class="btn go" data-lien="1">Recevoir mon lien</button><p class="grey">Tu reçois un mail avec un lien. Pas de mot de passe.</p></div>'; }
 document.getElementById('x-out').addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d || !d.lien || !sb) return;
   const email = txt('c-mail').trim(); if (!/^\S+@\S+\.\S+$/.test(email)) { cloudMsg = 'Écris ton adresse mail.'; renderConnexion(); return; }
-  sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: location.origin + location.pathname } }).then(({ error }) => { if (error) cloudMsg = 'Adresse inconnue ou pas de connexion.'; else { lienEnvoye = true; cloudMsg = ''; } renderConnexion(); }); });
+  sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: location.origin + location.pathname } }).then(({ error }) => { if (error) cloudMsg = error.status === 429 ? 'Trop de demandes. Attends quelques minutes.' : /not allowed/i.test(error.message || '') ? 'Cette adresse n\'est pas autorisée.' : 'Pas de connexion. Réessaie.'; else { lienEnvoye = true; cloudMsg = ''; } renderConnexion(); }); });
 async function demarrerCloud() {
   try { sb = globalThis.__SB_TEST || (await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')).createClient(SB.url, SB.cle);
     sb.auth.onAuthStateChange((_e, s) => { session = s; setTimeout(() => { if (!s) { pret = false; toutRendre(); return; } charger().catch((e) => { pret = false; cloudMsg = e.message; }).finally(toutRendre); }, 0); });
