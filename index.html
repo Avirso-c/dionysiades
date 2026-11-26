@@ -743,8 +743,11 @@ function envoyer(ops, ok, ko) { document.body.classList.add('attente');
   return ecrire(ops).then(charger).then(ok).catch((e) => ko(e.message)).finally(() => { document.body.classList.remove('attente'); renderJournal(); renderReleve(); vue(); }); }
 function renderConnexion() { const o = document.getElementById('x-out');
   o.innerHTML = lienEnvoye ? '<div class="card"><p class="big">Regarde tes mails.</p><p>Clique sur le lien dans le mail.</p></div>'
-    : '<div class="card"><p class="big">Bonjour.</p><label for="c-mail">Ton adresse mail<input id="c-mail" type="email" autocomplete="email"></label>' + (cloudMsg ? '<p class="err">' + esc(cloudMsg) + '</p>' : '') + '<button type="button" class="btn go" data-lien="1">Recevoir mon lien</button><p class="grey">Tu reçois un mail avec un lien. Pas de mot de passe.</p></div>'; }
-document.getElementById('x-out').addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d || !d.lien || !sb) return;
+    : '<div class="card"><p class="big">Bonjour.</p><p>Appuie sur le bouton vert.</p>' + (cloudMsg ? '<p class="err">' + esc(cloudMsg) + '</p>' : '') + '<button type="button" class="btn go" data-google="1">Continuer avec Google</button><p class="grey">Choisis ton compte Google. Pas de mot de passe à retenir.</p></div>'
+      + '<details class="card"><summary><span>Autre moyen</span><span class="grey">Lien par mail</span></summary><label for="c-mail">Ton adresse mail<input id="c-mail" type="email" autocomplete="email"></label><button type="button" class="btn" data-lien="1">Recevoir mon lien</button><p class="grey">Tu reçois un mail avec un lien. Deux mails par heure au maximum.</p></details>'; }
+document.getElementById('x-out').addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d || !sb) return;
+  if (d.google) { sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } }).then(({ error }) => { if (error) { cloudMsg = 'Connexion Google impossible. Réessaie.'; renderConnexion(); } }); return; }
+  if (!d.lien) return;
   const email = txt('c-mail').trim(); if (!/^\S+@\S+\.\S+$/.test(email)) { cloudMsg = 'Écris ton adresse mail.'; renderConnexion(); return; }
   sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: location.origin + location.pathname } }).then(({ error }) => { if (error) cloudMsg = error.status === 429 ? 'Trop de demandes. Attends quelques minutes.' : /not allowed/i.test(error.message || '') ? 'Cette adresse n\'est pas autorisée.' : 'Pas de connexion. Réessaie.'; else { lienEnvoye = true; cloudMsg = ''; } renderConnexion(); }); });
 async function demarrerCloud() {
