@@ -96,6 +96,29 @@ a.sec{min-height:52px;border:1px solid rgba(255,255,255,.95);background:rgba(255
 button.lieu{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;min-height:56px;font-size:16px}
 button.lieu span{font-weight:400;font-size:14px;color:#464c54}
 @media (prefers-reduced-motion:reduce){.swing{animation:none}.ring{transition:none}.vie i{animation:none;opacity:.7}}
+/* ---------- DA Korlab (essais « fond LED » du 26/11) en version claire : la page est un panneau de points, les pictogrammes et les messages sont en pixels carrés, les couleurs sont celles de Korlab (cyan, ambre, vert) sur de petits panneaux graphite. ---------- */
+:root{--k-fond:#14171c;--k-cyan:#8fecf9;--k-ambre:#ffc947;--k-vert:#5ee38c;--k-gris:#c3cad4}
+body{background:radial-gradient(circle,rgba(20,24,29,.16) 1px,transparent 1.5px) 0 0/7px 7px,linear-gradient(180deg,#d3d9df,#f1f3f5) fixed}
+.app{font:600 12.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;letter-spacing:.14em}
+.card{position:relative;background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(255,255,255,.8));border-radius:20px}
+.card>.grey:first-child{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.btn,a.sec,nav a,.pills a,.stepper button,.navb button{border-radius:14px}
+.btn.go,a.go{border-radius:14px;gap:10px;display:flex;align-items:center;justify-content:center;width:100%}
+.btn.go::before,a.go::before{content:"";width:7px;height:7px;flex:none;background:var(--k-cyan);box-shadow:0 0 8px var(--k-cyan)}
+nav a{gap:7px;font-size:15px}nav a svg{flex:none}
+.sig,.sig-ok{background:var(--k-fond);border:0;border-radius:11px;color:var(--k-cyan);box-shadow:0 1px 0 rgba(255,255,255,.14) inset,0 8px 16px -6px rgba(20,24,29,.55)}
+.sig svg{width:34px;height:34px}.sig.p svg{width:20px;height:20px}.sig.p{border-radius:7px}
+.sig .on{filter:drop-shadow(0 0 1.2px currentColor)}
+.sig-moyen,.sig-alerte{color:var(--k-ambre)}.sig-non{color:var(--k-gris)}.sig-pepite{color:var(--k-vert)}
+.bande{position:absolute;left:0;top:26%;bottom:26%;width:3px;border-radius:0 3px 3px 0;background:var(--c,var(--k-fond));box-shadow:0 0 6px -1px var(--c,transparent)}
+.led{background:var(--k-fond);border-radius:14px;padding:8px 10px;box-shadow:0 1px 0 rgba(255,255,255,.12) inset,0 14px 26px -12px rgba(20,24,29,.6);line-height:0;min-height:20px}
+.led svg{width:100%;height:auto;display:block}
+.led .on{fill:var(--k-cyan);filter:drop-shadow(0 0 .35px var(--k-cyan));animation:allume .28s steps(2,end) both}
+@keyframes allume{from{opacity:0}to{opacity:1}}
+.vie i{border-radius:0;background:#0aa5bd;box-shadow:0 0 6px var(--k-cyan)}
+.mk{border-radius:3px;width:14px;height:14px;margin:4px}.mk.evt{border-radius:0;background:var(--k-ambre)}.mk.vu{background:#14181d}
+.etq svg rect,.etq svg circle{shape-rendering:crispEdges}
+@media (prefers-reduced-motion:reduce){.led .on{animation:none}}
 .op .adm{display:none!important}
 body.attente main{opacity:.6;pointer-events:none}
 </style>
@@ -103,6 +126,7 @@ body.attente main{opacity:.6;pointer-events:none}
 <body>
 <main>
 <p class="app">Les Dionysiades</p>
+<div id="led" class="led" aria-hidden="true"></div>
 <nav id="nav"><a href="#aujourdhui" id="n-aujourdhui">Accueil</a><a href="#carte" id="n-carte">Carte</a><a href="#journal" id="n-journal">Journal</a><a href="#argent" id="n-argent" class="adm-nav">Et si…</a></nav>
 <section id="v-connexion" hidden><h1>Les Dionysiades</h1><div id="x-out"></div></section>
 <section id="v-aujourdhui"><p class="coach" id="coach" aria-live="polite"></p>
@@ -376,7 +400,24 @@ function save() { try { const s = {}; for (const [, [a, b]] of P) s[a + '.' + b]
 function origine(x) { return x.source ? '<span class="tag ok">Vérifié le ' + x.date.split('-').reverse().join('/') + '</span> ' + esc(x.source) : '<span class="tag">À vérifier</span> ' + esc(x.note || 'Chiffre choisi par prudence, modifiable dans les réglages.'); }
 const SIGNES = { ok: ['Oui', [".......","......#",".....#.","#...#..",".#.#...","..#....","......."]], moyen: ['Avec prudence', [".......",".......",".......","#.#.#.#",".......",".......","......."]], non: ['Non', [".......",".#...#.","..#.#..","...#...","..#.#..",".#...#.","......."]], alerte: ['Attention', ["...#...","...#...","...#...","...#...",".......","...#...","......."]], pepite: ['Pépite', ["...#...","..#.#..",".#...#.","#.....#",".#...#.","..#.#..","...#..."]] };
 const coulScore = (n) => (n >= 70 ? 'ok' : n >= 50 ? 'moyen' : 'non');
-function signe(k, petit) { const [nom, rows] = SIGNES[k] || SIGNES.moyen; return '<span class="sig sig-' + k + (petit ? ' p' : '') + '" role="img" aria-label="' + nom + '"><svg viewBox="0 0 42 42">' + rows.map((r, y) => [...r].map((ch, x) => (ch === '#' ? '<circle cx="' + (3 + x * 6) + '" cy="' + (3 + y * 6) + '" r="2.5"/>' : '')).join('')).join('') + '</svg></span>'; }
+const pixels = (rows, cl) => rows.map((r, y) => [...r].map((ch, x) => (ch === '#' ? '<rect' + (cl ? ' class="' + cl + '"' : '') + ' x="' + (x + 0.1) + '" y="' + (y + 0.1) + '" width=".8" height=".8"/>' : '')).join('')).join('');
+const eteints = (w, h) => { let r = ''; for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) r += '<rect x="' + (x + 0.3) + '" y="' + (y + 0.3) + '" width=".4" height=".4"/>'; return '<g fill="#2b323c">' + r + '</g>'; };
+const COUL_SIGNE = { ok: 'var(--k-cyan)', moyen: 'var(--k-ambre)', alerte: 'var(--k-ambre)', non: 'var(--k-gris)', pepite: 'var(--k-vert)' };
+function signe(k, petit) { const [nom, rows] = SIGNES[k] || SIGNES.moyen; return '<span class="sig sig-' + k + (petit ? ' p' : '') + '" role="img" aria-label="' + nom + '"><svg viewBox="-1 -1 9 9" shape-rendering="crispEdges">' + (petit ? '' : eteints(7, 7)) + '<g fill="currentColor">' + pixels(rows, 'on') + '</g></svg></span>'; }
+// Bande d'état sur le bord gauche d'une carte, comme sur Korlab.
+const bande = (k) => '<i class="bande" style="--c:' + (COUL_SIGNE[k] || COUL_SIGNE.moyen) + '"></i>';
+// Petit panneau LED : de courts messages écrits en points, lettre 5 × 7.
+const F5 = { '0': [14,17,19,21,25,17,14], '1': [4,12,4,4,4,4,14], '2': [14,17,1,2,4,8,31], '3': [31,2,4,2,1,17,14], '4': [2,6,10,18,31,2,2], '5': [31,16,30,1,1,17,14], '6': [6,8,16,30,17,17,14], '7': [31,1,2,4,8,8,8], '8': [14,17,17,14,17,17,14], '9': [14,17,17,15,1,2,12],
+  A: [14,17,17,17,31,17,17], B: [30,17,17,30,17,17,30], C: [14,17,16,16,16,17,14], D: [28,18,17,17,17,18,28], E: [31,16,16,30,16,16,31], F: [31,16,16,30,16,16,16], G: [14,17,16,23,17,17,15], H: [17,17,17,31,17,17,17], I: [14,4,4,4,4,4,14], J: [7,2,2,2,2,18,12], K: [17,18,20,24,20,18,17], L: [16,16,16,16,16,16,31], M: [17,27,21,21,17,17,17],
+  N: [17,17,25,21,19,17,17], O: [14,17,17,17,17,17,14], P: [30,17,17,30,16,16,16], Q: [14,17,17,17,21,18,13], R: [30,17,17,30,20,18,17], S: [15,16,16,14,1,1,30], T: [31,4,4,4,4,4,4], U: [17,17,17,17,17,17,14], V: [17,17,17,17,17,10,4], W: [17,17,17,21,21,21,10], X: [17,17,10,4,10,17,17], Y: [17,17,17,10,4,4,4], Z: [31,1,2,4,8,16,31],
+  ' ': [0,0,0,0,0,0,0], ':': [0,12,12,0,12,12,0], '.': [0,0,0,0,0,12,12], '-': [0,0,0,31,0,0,0], '/': [0,1,2,4,8,16,0], '+': [0,4,4,31,4,4,0], '!': [4,4,4,4,4,0,4], '?': [14,17,1,2,4,0,4], '€': [6,9,28,8,28,9,6] };
+const LED_COLS = 84;
+function ledSvg(txt) { const t = String(txt).normalize('NFD').replace(/[^ -~€]/g, '').toUpperCase().slice(0, 13); let x = Math.max(1, Math.floor((LED_COLS - t.length * 6 + 1) / 2)), r = '';
+  for (const ch of t) { const g = F5[ch] || F5[' ']; for (let y = 0; y < 7; y++) for (let c = 0; c < 5; c++) if (g[y] & (16 >> c)) r += '<rect class="on" x="' + (x + c + 0.1) + '" y="' + (y + 1.1) + '" width=".8" height=".8" style="animation-delay:' + (x + c) * 9 + 'ms"/>'; x += 6; }
+  return '<svg viewBox="0 0 ' + LED_COLS + ' 9" shape-rendering="crispEdges">' + eteints(LED_COLS, 9) + r + '</svg>'; }
+let ledMsgs = [], ledI = 0;
+function ledMontrer() { const e = document.getElementById('led'); if (e) e.innerHTML = ledMsgs.length ? ledSvg(ledMsgs[ledI % ledMsgs.length]) : ''; }
+function led(liste) { const sg = liste.join('|'); if (sg === led.sig) return; led.sig = sg; ledMsgs = liste; ledI = 0; ledMontrer(); }
 function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 function ligne(nom, montant, pourquoi, src) { return '<details><summary><span>' + nom + '</span><b>' + eur(montant) + '</b></summary><p class="why">' + pourquoi + '</p><p class="why">' + src + '</p></details>'; }
 function render() {
@@ -799,7 +840,9 @@ const lienSur = (s) => (/^https:\/\/[^\s"'<>]+$/.test((s || '').trim()) ? s.trim
 const PICTOS = { Jouets: ["...###...","..#...#..",".#.#.#.#.",".#.....#.",".#.#.#.#.",".#.....#.",".#.#.#.#.","..#...#..","...###..."], Livres: ["#########","#...#...#","#.#.#.#.#","#...#...#","#.#.#.#.#","#...#...#","#.#.#.#.#","#...#...#","#########"], Pulls: ["..##.##..",".#######.","#########","##.###.##","#..###..#","#..###..#","...###...","...###...","...###..."], Jeans: ["..#####..","..#####..","..#####..","..##.##..","..##.##..","..##.##..","..##.##..","..##.##..","..##.##.."], Tenues: ["...#.#...","...###...","...###...","..#####..","..#####..",".#######.",".#######.","#########","#########"], Manteaux: ["..##.##..",".#######.","#########","#########","#.#####.#","#.#####.#","..#####..","..#####..","..#####.."] };
 const PICTO_DEFAUT = ["..#####..",".#######.","#########","#.#####.#","#.#####.#","..#####..","..#####..","..#####..","..#...#.."];
 const pictoDe = (nom) => PICTOS[Object.keys(PICTOS).find((k) => nom.startsWith(k))] || PICTO_DEFAUT;
-const svgPicto = (rows) => '<svg aria-hidden="true" width="76" height="76" viewBox="0 0 54 54" fill="#14181d">' + rows.map((r, y) => [...r].map((ch, x) => (ch === '#' ? '<circle cx="' + (3 + x * 6) + '" cy="' + (3 + y * 6) + '" r="2.3"/>' : '')).join('')).join('') + '</svg>';
+const svgPicto = (rows) => '<svg aria-hidden="true" width="76" height="76" viewBox="0 0 9 9" fill="#14181d" shape-rendering="crispEdges">' + pixels(rows) + '</svg>';
+const NAVP = { aujourdhui: ["....#....","...###...","..#####..",".#######.","#########",".#.....#.",".#.###.#.",".#.#.#.#.",".###.###."], carte: ["..#####..",".#######.",".##...##.",".##...##.",".#######.","..#####..","...###...","....#....","........."], journal: [".#######.",".#.....#.",".#.###.#.",".#.....#.",".#.###.#.",".#.....#.",".#.##..#.",".#.....#.",".#######."], argent: ["...#.#...","..#####..",".##...##.","##.....##",".#..#..#.","##.....##",".##...##.","..#####..","...#.#..."] };
+for (const [k, rows] of Object.entries(NAVP)) { const a = document.getElementById('n-' + k); if (a && !a._px) { a._px = 1; a.innerHTML = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 9 9" fill="currentColor" shape-rendering="crispEdges">' + pixels(rows) + '</svg>' + a.textContent; } }
 const CINTRE = '<svg class="hanger" aria-hidden="true" width="112" height="28" viewBox="0 0 120 30" fill="none" stroke="#14181d" stroke-width="2" stroke-linecap="round" opacity=".7"><path d="M60 2v8M60 10 8 26h104z"/></svg>';
 
 const RAYON = 178; let portant = [], angleP = 0, devant = 0, signature = '', dejaSalue = false;
@@ -822,7 +865,7 @@ function ficheAccueil() { const o = document.getElementById('a-out'), t = portan
   let prix = '<p class="grey">Montre-moi une annonce : je te dis le bon prix.</p>';
   if (t.prixCourant) { let m = prixAchatMax({ vente: t.prixCourant }, config); if (etat.apports.length) m = Math.min(m, b.maxParArticle); prix = m > 0 ? '<p>Se vend autour de <b>' + eur(t.prixCourant) + '</b>. Paie dans l\'idéal <b>' + eur(m) + '</b> au plus.</p>' : '<p>Se vend autour de <b>' + eur(t.prixCourant) + '</b>. Pas assez pour gagner.</p>'; }
   const q = encodeURIComponent(t.recherche || t.nom);
-  let h = '<div class="card"><div class="row">' + signe(coulScore(t.score)) + '<p class="big">' + esc(t.nom) + '</p></div><p>' + esc(t.raison) + '.</p>' + prix
+  let h = '<div class="card">' + bande(coulScore(t.score)) + '<div class="row">' + signe(coulScore(t.score)) + '<p class="big">' + esc(t.nom) + '</p></div><p>' + esc(t.raison) + '.</p>' + prix
     + (t.score >= 50 ? '<a class="go" href="#carte">Où l\'acheter près de moi</a><button type="button" class="btn" data-annonce="' + devant + '">J\'ai trouvé une annonce</button><p class="grey">En ligne : <a class="ext" target="_blank" rel="noopener" href="https://www.leboncoin.fr/recherche?locations=Paris&sort=time&text=' + q + '">Leboncoin</a> · <a class="ext" target="_blank" rel="noopener" href="https://www.vinted.fr/catalog?order=newest_first&search_text=' + q + '">Vinted</a></p>' : '<p class="grey">Trop cher ou trop gros pour toi en ce moment.</p>')
     + (ouvert ? '' : '<p class="grey">Tu peux regarder. Pour acheter, finis d\'abord <a class="ext" href="#plan">tes étapes</a>.</p>')
     + '<details><summary><span>Pourquoi ?</span><span class="grey">Score ' + t.score + ' sur 100</span></summary><p class="why">Score de l\'agent : ' + t.scoreAgent + '. ' + (t.confirme ? 'Tes relevés le changent de ' + (t.ajustement > 0 ? '+' : '') + t.ajustement + '.' : 'Pas encore confirmé par tes relevés.') + '</p><p class="why">Confiance : ' + esc(t.confiance) + '. Source : ' + esc(t.source) + '</p></details></div>';
@@ -852,7 +895,7 @@ function renderAnnonce() { const o = document.getElementById('n-out');
     + '<p class="grey">L\'annonce est en ligne depuis…</p>' + choix('anciennete', ANCS) + champ('revente', 'Tu le revends combien ? (€)', 'number', 'Je le remplis seul quand tu as fait des relevés.') + champ('lien', 'Lien de l\'annonce (facultatif)', 'url')
     + (annErr ? '<p class="err">' + esc(annErr) + '</p>' : '') + '<button type="button" class="btn go" data-analyse="1">Dis-moi quoi faire</button></div>';
   if (annRes) { const r = annRes, col = r.pepite ? 'pepite' : { acheter: 'ok', negocier: 'moyen', passer: 'non' }[r.verdict], mot = r.pepite ? 'PÉPITE' : { acheter: 'ACHÈTE', negocier: 'NÉGOCIE', passer: 'PASSE' }[r.verdict], l = lienSur(ann.lien);
-    h += '<div class="card"><div class="row">' + signe(col) + '<p class="big">' + mot + '</p></div>' + r.raisons.map((x) => '<p>' + esc(x) + '</p>').join('');
+    h += '<div class="card">' + bande(col) + '<div class="row">' + signe(col) + '<p class="big">' + mot + '</p></div>' + r.raisons.map((x) => '<p>' + esc(x) + '</p>').join('');
     if (r.offre !== null) { const msg = messageOffre({ nom: ann.nom, offre: r.offre, anciennete: ann.anciennete, verdict: r.verdict });
       h += '<div class="row" style="justify-content:space-between"><span>Propose</span><b class="big">' + eur(r.offre) + '</b></div><div class="row" style="justify-content:space-between"><span>Ne dépasse pas</span><b>' + eur(r.prixMax) + '</b></div><div class="row" style="justify-content:space-between"><span>Il te coûtera en tout</span><b>' + eur(r.coutOffre) + '</b></div><div class="row" style="justify-content:space-between"><span>Tu gagnes environ</span><b>' + eur(r.gainOffre) + '</b></div>'
         + '<p class="grey">Ton message, prêt à envoyer</p><p class="msg" id="an-msg">' + esc(msg) + '</p><button type="button" class="btn go" data-copier="1">' + (annCopie ? 'Copié !' : 'Copier le message') + '</button>' + (l ? '<a class="sec" target="_blank" rel="noopener" href="' + esc(l) + '">Ouvrir l\'annonce</a>' : '') + '<p class="grey">Colle le message dans le site, puis envoie.</p>'; }
@@ -962,7 +1005,7 @@ function renderCarte() { const top = document.getElementById('k-top'), o = docum
     const mv = [...new Set(visites.map((x) => x.lieu_id))].map((id) => lieux.find((x) => x.id === id)).filter(Boolean);
     if (mv.length) h += '<div class="card"><p class="grey">Déjà visités</p>' + mv.slice(-8).reverse().map(ligneLieu).join('') + '</div>';
     h += '<p class="grey">Boutiques : OpenStreetMap. Événements : « Que faire à Paris » (Ville de Paris). Boutiques lues le ' + jourFr(lieuxDate) + '. Rond : boutique. Losange : événement. Plein : déjà visité.</p>'; }
-  o.innerHTML = h; poserMarqueurs(); if (l && carteL) carteL.panTo([l.lat, l.lon]); }
+  o.innerHTML = h; majLed(); poserMarqueurs(); if (l && carteL) carteL.panTo([l.lat, l.lon]); }
 function noterVisite(l) { const ligne = { lieu_id: l.id, lieu_nom: l.nom, genre: l.genre, date: auj() }; if (dejaVu(l.id).some((v) => v.date === ligne.date)) return;
   if (!CLOUD) { visites.push(ligne); try { localStorage.setItem(VKEY, JSON.stringify(visites)); } catch (e) {} renderCarte(); return; }
   document.body.classList.add('attente'); Promise.resolve(sb.from('visites').insert(ligne)).then(({ error }) => { if (error) throw new Error('x'); visites.push(ligne); carteMsg = ''; }).catch(() => { carteMsg = 'Visite pas enregistrée. Vérifie ta connexion.'; }).finally(() => { document.body.classList.remove('attente'); renderCarte(); }); }
@@ -973,7 +1016,12 @@ for (const z of ['k-top', 'k-out']) document.getElementById(z).addEventListener(
   else if (d.achatici && l) { noterVisite(l); pre = { 'f-ou': l.nom }; formulaire = 'achat'; erreur = ''; location.hash = '#journal'; renderJournal(); if (typeof window.dispatchEvent !== 'function') vue(); }
   else if (d.recharger) { carteEtat = 'vide'; carteMsg = ''; renderCarte(); }
   else if (d.moi) { try { navigator.geolocation.getCurrentPosition((p) => { moi = { lat: p.coords.latitude, lon: p.coords.longitude }; carteMsg = ''; renderCarte(); if (carteL) carteL.setView([moi.lat, moi.lon], 14); }, () => { carteMsg = 'Je n\'ai pas le droit de voir où tu es. Autorise la position, ou choisis sur la carte.'; renderCarte(); }, { timeout: 10000 }); } catch (e) { carteMsg = 'La position ne marche pas sur ce téléphone.'; renderCarte(); } } });
-function vue() { const N = ['aujourdhui', 'carte', 'journal', 'argent', 'releve', 'chercher', 'plan', 'annonce'];
+function majLed() { const h = location.hash.slice(1), b = bilan(etat, config, auj()), caisse = etat.apports.length ? 'CAISSE ' + Math.max(0, Math.floor(b.disponible)) + ' €' : null, n = etat.articles.length;
+  if (CLOUD && !pret) return led(['BONJOUR']);
+  if (h === 'carte') return led([lieux.length ? lieux.length + ' LIEUX' : 'JE CHERCHE', caisse || 'OU ACHETER']);
+  if (h === 'journal') return led([caisse || 'JOURNAL', n + ' ARTICLE' + (n > 1 ? 'S' : '')]);
+  return led(['BONJOUR', TENDANCES.length + ' TENDANCES', 'MAJ ' + TENDANCES[0].date.slice(8, 10) + '/' + TENDANCES[0].date.slice(5, 7)].concat(caisse ? [caisse] : [])); }
+function vue() { majLed(); const N = ['aujourdhui', 'carte', 'journal', 'argent', 'releve', 'chercher', 'plan', 'annonce'];
   const bloque = CLOUD && !pret; document.getElementById('v-connexion').hidden = !bloque; document.getElementById('nav').hidden = bloque;
   if (bloque) { for (const n of N) document.getElementById('v-' + n).hidden = true; renderConnexion(); return; }
   const h = N.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'aujourdhui';
@@ -1077,6 +1125,7 @@ async function demarrerCloud() {
   } catch (e) { cloudMsg = 'Pas de connexion. Recharge la page.'; toutRendre(); }
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 }
+if (typeof setInterval === 'function' && !globalThis.__SB_TEST && !calme()) setInterval(() => { ledI++; ledMontrer(); }, 4200);
 window.addEventListener('hashchange', vue); renderJournal(); vue(); if (CLOUD) demarrerCloud();
 </script>
 </body>
