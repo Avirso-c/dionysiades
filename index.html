@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#d3d9df">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Les Dionysiades</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@900&family=Inter:wght@400;700&display=swap">
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:linear-gradient(180deg,#d3d9df,#f1f3f5) fixed;color:#14181d;font-family:Inter,system-ui,sans-serif;font-size:19px;line-height:1.35}
+main{max-width:460px;margin:0 auto;padding:24px 20px 60px;display:flex;flex-direction:column;gap:16px}
+h1{font-family:Doto,Inter,sans-serif;font-weight:900;font-size:32px;margin:0;letter-spacing:.5px}
+.app{font-size:14px;color:#464c54;margin:0;letter-spacing:1px;text-transform:uppercase}
+.card{border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.6);box-shadow:0 8px 24px rgba(20,24,29,.10);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.big{font-size:26px;font-weight:700;margin:0}
+.grey{color:#464c54;font-size:15px;margin:0}
+details{border-top:1px solid rgba(20,24,29,.10);padding-top:10px}
+details:first-of-type{border-top:0;padding-top:0}
+summary{display:flex;justify-content:space-between;gap:12px;cursor:pointer;list-style:none;min-height:44px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary b{white-space:nowrap}
+.why{font-size:15px;color:#464c54;margin:6px 0 4px}
+.dot{width:26px;height:26px;border-radius:50%;flex:none}
+.row{display:flex;align-items:center;gap:12px}
+.stepper{display:flex;align-items:center;gap:10px}
+.stepper button{width:56px;height:56px;border-radius:18px;border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.7);font-size:28px;font-weight:700;color:#14181d;cursor:pointer}
+input{font:700 22px Inter,system-ui,sans-serif;color:#14181d;border:1px solid rgba(20,24,29,.25);border-radius:14px;padding:10px 12px;width:100%;min-height:52px;background:#fff}
+label{display:flex;flex-direction:column;gap:4px;font-size:15px;color:#464c54}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.alert{background:#fde8e6;border-color:#b91c1c}
+.tag{font-size:12px;border-radius:999px;padding:2px 8px;background:#e6eaee;color:#464c54;white-space:nowrap}
+.tag.ok{background:#dff1e4;color:#165c2d}
+nav{display:flex;gap:8px}
+nav a{flex:1;text-align:center;min-height:48px;display:flex;align-items:center;justify-content:center;border-radius:16px;border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.45);color:#14181d;font-weight:700;text-decoration:none}
+nav a.on{background:#14181d0d;border-color:#14181d}
+section{display:flex;flex-direction:column;gap:16px}
+section[hidden]{display:none}
+.btn{min-height:56px;border-radius:18px;border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.7);font:700 18px Inter,system-ui,sans-serif;color:#14181d;cursor:pointer;padding:8px 12px}
+.btn.go{background:#1e7a3c;color:#fff;border-color:#1e7a3c;min-height:64px;font-size:20px}
+.err{color:#b91c1c;font-weight:700;margin:0}
+.art{border-top:1px solid rgba(20,24,29,.10);padding-top:10px;display:flex;flex-direction:column;gap:8px}
+.art:first-of-type{border-top:0;padding-top:0}
+textarea{width:100%;min-height:120px;font:13px ui-monospace,monospace;border-radius:12px;border:1px solid rgba(20,24,29,.25);padding:8px}
+.bar{height:14px;border-radius:999px;background:rgba(20,24,29,.10);overflow:hidden}
+.bar div{height:100%;background:#1e7a3c}
+a.tile{display:flex;justify-content:space-between;align-items:center;gap:12px;text-decoration:none;color:#14181d}
+a.tile b{font-size:22px}
+a.ext{color:#14181d;font-weight:700}
+.op .adm{display:none!important}
+body.attente main{opacity:.6;pointer-events:none}
+</style>
+</head>
+<body>
+<main>
+<p class="app">Les Dionysiades</p>
+<nav id="nav"><a href="#aujourdhui" id="n-aujourdhui">Aujourd'hui</a><a href="#journal" id="n-journal">Journal</a><a href="#argent" id="n-argent" class="adm-nav">Et si…</a></nav>
+<section id="v-connexion" hidden><h1>Les Dionysiades</h1><div id="x-out"></div></section>
+<section id="v-aujourdhui"><h1>Aujourd'hui</h1><div id="a-out"></div></section>
+<section id="v-releve" hidden><h1>Relevé du jour</h1><div id="r-out"></div><a class="ext" href="#aujourdhui">Retour</a></section>
+<section id="v-chercher" hidden><h1>À chercher</h1><div id="c-out"></div><a class="ext" href="#aujourdhui">Retour</a></section>
+<section id="v-journal" hidden><h1>Mon journal</h1><div id="j-out"></div></section>
+<section id="v-argent" hidden><h1>Ton argent</h1>
+<div class="card">
+<label for="cap">Tu as combien pour commencer ?</label>
+<div class="stepper"><button type="button" id="moins" aria-label="Enlever 10 euros">−</button><input id="cap" type="number" inputmode="decimal" min="0" step="10"><button type="button" id="plus" aria-label="Ajouter 10 euros">+</button></div>
+</div>
+<div id="out"></div>
+<details class="card adm" id="admin"><summary><b>Réglages (Admin)</b><span class="grey">Ouvrir</span></summary><div class="grid" id="params"></div><p class="grey">Chaque réglage change tous les calculs tout de suite.</p></details>
+</section>
+</main>
+<script>
+let config = {
+  "nom_application": "Les Dionysiades",
+  "_lisezmoi": "Tous les chiffres modifiables sont ici. 'source' + 'date' = vérifié. 'hypothese': true = à vérifier avant usage réel.",
+  "vinted": {
+    "frais_vendeur_pct": {
+      "valeur": 0,
+      "source": "https://www.vinted.fr/pro (Vinted Pro gratuit, mise en ligne sans frais)",
+      "date": "2026-11-26",
+      "note": "Un site tiers (vintedcrm.com) annonce 5 % pour les Pro : à confirmer dans les Termes et conditions Vinted Pro à l'inscription."
+    },
+    "frais_acheteur_pct": {
+      "valeur": 5,
+      "source": "https://www.vinted.fr/help/342",
+      "date": "2026-11-26"
+    },
+    "frais_acheteur_fixe_eur": {
+      "valeur": 0.7,
+      "source": "https://www.vinted.fr/help/342",
+      "date": "2026-11-26"
+    }
+  },
+  "statut": {
+    "cotisations_pct_du_prix_de_vente": {
+      "valeur": 12.3,
+      "source": "https://www.economie.gouv.fr/micro-entreprises-quel-est-le-montant-de-vos-cotisations-sociales",
+      "date": "2026-11-26"
+    },
+    "plafond_ca_micro_eur": {
+      "valeur": 203100,
+      "source": "https://propulsebyca.fr/micro-entrepreneur/achat-revente",
+      "date": "2026-11-26"
+    },
+    "franchise_tva_eur": {
+      "valeur": 85000,
+      "source": "https://propulsebyca.fr/micro-entrepreneur/achat-revente",
+      "date": "2026-11-26"
+    }
+  },
+  "transport": {
+    "navigo_mois_eur": {
+      "valeur": 90.8,
+      "source": "https://www.iledefrance-mobilites.fr/tarifs-titre-de-transport-en-commun-2026",
+      "date": "2026-11-26"
+    },
+    "navigo_semaine_eur": {
+      "valeur": 32.4,
+      "source": "https://bonjour-ratp.fr/actualites/articles/tarifs-forfaits-navigo-2026",
+      "date": "2026-11-26"
+    },
+    "ticket_metro_eur": {
+      "valeur": 2.55,
+      "source": "https://bonjour-ratp.fr/actualites/articles/tarifs-forfaits-navigo-2026",
+      "date": "2026-11-26"
+    }
+  },
+  "depart": {
+    "capital_total_eur": {
+      "valeur": 100,
+      "source": "Décision de Cyrille (Admin)",
+      "date": "2026-11-26"
+    },
+    "tickets_premier_cycle": {
+      "valeur": 8,
+      "hypothese": true,
+      "note": "4 allers-retours pour aller chercher des articles"
+    },
+    "materiel_eur": {
+      "valeur": 10,
+      "hypothese": true,
+      "note": "ruban adhésif + mètre ; emballages récupérés ; prix à relever en magasin"
+    },
+    "reserve_pct_du_capital": {
+      "valeur": 20,
+      "hypothese": true
+    },
+    "creation_entreprise_eur": {
+      "valeur": 0,
+      "hypothese": true
+    }
+  },
+  "securite": {
+    "max_pct_du_stock_par_article": {
+      "valeur": 10,
+      "hypothese": true
+    },
+    "emballage_par_article_eur": {
+      "valeur": 0.3,
+      "hypothese": true
+    },
+    "jours_avant_alerte_stock": {
+      "valeur": 14,
+      "source": "Cahier des charges de Cyrille (alerte à 14 jours)",
+      "date": "2026-11-26"
+    }
+  },
+  "feux": {
+    "vert_gain_min_eur": {
+      "valeur": 5,
+      "hypothese": true
+    },
+    "vert_roi_min_pct": {
+      "valeur": 100,
+      "hypothese": true
+    },
+    "orange_gain_min_eur": {
+      "valeur": 2,
+      "hypothese": true
+    }
+  },
+  "releve": {
+    "jours_fenetre": {
+      "valeur": 7,
+      "hypothese": true
+    },
+    "min_releves": {
+      "valeur": 2,
+      "hypothese": true,
+      "note": "un seul relevé ne change pas le score : on attend une confirmation"
+    },
+    "points_par_cran": {
+      "valeur": 10,
+      "hypothese": true
+    }
+  }
+};
+const CONFIG_BASE = JSON.parse(JSON.stringify(config));
+const v = (x) => x.valeur;
+const r2 = (n) => Math.round(n * 100) / 100;
+
+// Ce qu'il reste sur UN article.
+// gain = prix de vente - prix d'achat - cotisations (% du prix de VENTE) - frais vendeur Vinted - emballage - autres frais
+function gainArticle({ achat, vente, autresFrais = 0 }, c = config) {
+  for (const n of [achat, vente, autresFrais]) if (!Number.isFinite(n) || n < 0) throw new Error('Montant invalide');
+  const cotisations = vente * v(c.statut.cotisations_pct_du_prix_de_vente) / 100;
+  const fraisVinted = vente * v(c.vinted.frais_vendeur_pct) / 100;
+  const emballage = v(c.securite.emballage_par_article_eur);
+  const gain = vente - achat - cotisations - fraisVinted - emballage - autresFrais;
+  const mise = achat + emballage + autresFrais;
+  return { cotisations: r2(cotisations), fraisVinted: r2(fraisVinted), emballage, gain: r2(gain), roiPct: mise > 0 ? Math.round(gain / mise * 100) : null };
+}
+
+// Feu tricolore. Le rouge gagne toujours si l'article dépasse le maximum autorisé.
+function feu({ achat, vente, autresFrais = 0, stockTotal }, c = config) {
+  const g = gainArticle({ achat, vente, autresFrais }, c);
+  const maxParArticle = stockTotal * v(c.securite.max_pct_du_stock_par_article) / 100;
+  if (achat > maxParArticle) return { couleur: 'rouge', raison: 'Trop cher pour ton budget.', ...g };
+  if (g.gain >= v(c.feux.vert_gain_min_eur) && g.roiPct >= v(c.feux.vert_roi_min_pct)) return { couleur: 'vert', raison: 'Bonne affaire.', ...g };
+  if (g.gain >= v(c.feux.orange_gain_min_eur)) return { couleur: 'orange', raison: 'Négocie le prix.', ...g };
+  return { couleur: 'rouge', raison: 'Tu ne gagnes pas assez.', ...g };
+}
+
+// Prix d'achat maximum pour rester au vert (gain mini ET rendement mini), à 0,50 € près vers le bas.
+function prixAchatMax({ vente, autresFrais = 0 }, c = config) {
+  let best = 0;
+  for (let a = 0; a <= vente; a = r2(a + 0.5)) {
+    const g = gainArticle({ achat: a, vente, autresFrais }, c);
+    if (g.gain >= v(c.feux.vert_gain_min_eur) && g.roiPct >= v(c.feux.vert_roi_min_pct)) best = a; else if (a > 0) break;
+  }
+  return best;
+}
+
+// Répartition du capital de départ : transport + matériel + réserve + création, le reste va au stock.
+function repartitionCapital(c = config) {
+  const total = v(c.depart.capital_total_eur);
+  const transport = r2(v(c.depart.tickets_premier_cycle) * v(c.transport.ticket_metro_eur));
+  const materiel = v(c.depart.materiel_eur), creation = v(c.depart.creation_entreprise_eur);
+  const reserve = r2(total * v(c.depart.reserve_pct_du_capital) / 100);
+  const stock = r2(total - transport - materiel - reserve - creation);
+  if (stock <= 0) throw new Error('Capital insuffisant : il ne reste rien pour acheter des articles');
+  return { total, transport, materiel, reserve, creation, stock, maxParArticle: r2(stock * v(c.securite.max_pct_du_stock_par_article) / 100) };
+}
+
+// Bilan d'un cycle : on dépense tout le stock en articles au même prix, on revend, on retire le transport.
+function bilanCycle({ achat, vente, partVendue = 1 }, c = config) {
+  const rep = repartitionCapital(c);
+  const nb = Math.floor(rep.stock / achat), vendus = Math.floor(nb * partVendue);
+  const g = gainArticle({ achat, vente }, c);
+  const encaisse = r2(vendus * (vente - g.cotisations - g.fraisVinted));
+  const depense = r2(nb * (achat + g.emballage) + rep.transport);
+  return { nb, vendus, depense, encaisse, resultat: r2(encaisse - depense) };
+}
+
+// Nombre de ventes par mois pour atteindre un objectif de gain.
+function ventesPourObjectif({ objectifMensuel, achat, vente }, c = config) {
+  const g = gainArticle({ achat, vente }, c).gain;
+  if (g <= 0) return Infinity;
+  return Math.ceil(objectifMensuel / g);
+}
+
+const eur = (n) => n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+const P = [ // réglages modifiables : [libellé, chemin dans la config, pas]
+  ['Tickets pour le 1er mois', ['depart','tickets_premier_cycle'], 1], ['Prix du ticket (€)', ['transport','ticket_metro_eur'], 0.05],
+  ['Matériel (€)', ['depart','materiel_eur'], 1], ['Argent de secours (%)', ['depart','reserve_pct_du_capital'], 5],
+  ['Maximum par article (% du stock)', ['securite','max_pct_du_stock_par_article'], 1], ['Cotisations (% du prix de vente)', ['statut','cotisations_pct_du_prix_de_vente'], 0.1],
+  ['Emballage par article (€)', ['securite','emballage_par_article_eur'], 0.05], ['Frais vendeur Vinted (%)', ['vinted','frais_vendeur_pct'], 0.5],
+  ['Exemple : prix d\'achat (€)', ['exemple','achat'], 0.5], ['Exemple : prix de vente (€)', ['exemple','vente'], 0.5]];
+config.exemple = { achat: { valeur: 4, hypothese: true }, vente: { valeur: 12, hypothese: true } };
+const KEY = 'dionysiades-reglages';
+try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s) for (const [k, val] of Object.entries(s)) { const [a, b] = k.split('.'); if (config[a] && config[a][b] && Number.isFinite(val)) config[a][b].valeur = val; } } catch (e) {}
+function save() { try { const s = {}; for (const [, [a, b]] of P) s[a + '.' + b] = config[a][b].valeur; s['depart.capital_total_eur'] = config.depart.capital_total_eur.valeur; localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
+function origine(x) { return x.source ? '<span class="tag ok">Vérifié le ' + x.date.split('-').reverse().join('/') + '</span> ' + esc(x.source) : '<span class="tag">À vérifier</span> ' + esc(x.note || 'Chiffre choisi par prudence, modifiable dans les réglages.'); }
+function esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function ligne(nom, montant, pourquoi, src) { return '<details><summary><span>' + nom + '</span><b>' + eur(montant) + '</b></summary><p class="why">' + pourquoi + '</p><p class="why">' + src + '</p></details>'; }
+function render() {
+  const out = document.getElementById('out'), c = config, d = c.depart;
+  let r;
+  try { r = repartitionCapital(c); } catch (e) {
+    out.innerHTML = '<div class="card alert"><div class="row"><div class="dot" style="background:#b91c1c"></div><p class="big">Pas assez pour commencer.</p></div><p>Il ne reste rien pour acheter des articles.</p><p class="grey">Ajoute de l\'argent, ou baisse les trajets et le matériel dans les réglages.</p></div>'; return; }
+  const a = c.exemple.achat.valeur, v2 = c.exemple.vente.valeur;
+  let h = '<div class="card"><p class="grey">Voici où va ton argent. Touche une ligne pour comprendre.</p>'
+    + ligne('Pour acheter des articles', r.stock, 'C\'est ce qui reste quand on a mis de côté les trajets, le matériel et l\'argent de secours.', 'Calcul : ' + eur(r.total) + ' − ' + eur(r.transport) + ' − ' + eur(r.materiel) + ' − ' + eur(r.reserve) + (r.creation ? ' − ' + eur(r.creation) : '') + '.')
+    + ligne('Pour les trajets', r.transport, d.tickets_premier_cycle.valeur + ' tickets à ' + eur(c.transport.ticket_metro_eur.valeur) + '.', origine(c.transport.ticket_metro_eur))
+    + ligne('Pour le matériel', r.materiel, 'Ruban adhésif, mètre, emballages.', origine(d.materiel_eur))
+    + ligne('On n\'y touche pas', r.reserve, 'C\'est l\'argent de secours : ' + d.reserve_pct_du_capital.valeur + ' % de ce que tu as.', origine(d.reserve_pct_du_capital)) + '</div>';
+  h += '<div class="card"><div class="row"><div class="dot" style="background:#b91c1c"></div><p class="big">Règle d\'or</p></div><p>Jamais plus de <b>' + eur(r.maxParArticle) + '</b> pour un article.</p><p class="grey">C\'est ' + c.securite.max_pct_du_stock_par_article.valeur + ' % de l\'argent des articles. Un seul mauvais achat ne doit pas tout bloquer.</p></div>';
+  if (a > 0 && v2 > 0) {
+    const g = gainArticle({ achat: a, vente: v2 }, c), f = feu({ achat: a, vente: v2, stockTotal: r.stock }, c);
+    const col = { vert: '#1e7a3c', orange: '#b45309', rouge: '#b91c1c' }[f.couleur];
+    h += '<div class="card"><p class="grey">Un exemple</p><p>Tu achètes <b>' + eur(a) + '</b>. Tu vends <b>' + eur(v2) + '</b>.</p><div class="row"><div class="dot" style="background:' + col + '"></div><p class="big">Il te reste ' + eur(g.gain) + '</p></div><p class="grey">' + esc(f.raison) + '</p>'
+      + '<details><summary><span>Pourquoi ?</span><span class="grey">Voir le calcul</span></summary><p class="why">' + eur(v2) + ' − ' + eur(a) + ' (achat) − ' + eur(g.cotisations) + ' (cotisations) − ' + eur(g.fraisVinted) + ' (frais Vinted) − ' + eur(g.emballage) + ' (emballage) = ' + eur(g.gain) + '.</p><p class="why">Cotisations : ' + origine(c.statut.cotisations_pct_du_prix_de_vente) + '</p><p class="why">Frais Vinted : ' + origine(c.vinted.frais_vendeur_pct) + '</p></details>'
+      + '<p>Pour vendre ' + eur(v2) + ', paie au maximum <b>' + eur(prixAchatMax({ vente: v2 }, c)) + '</b>.</p></div>';
+    if (a <= r.stock) {
+      h += '<div class="card"><p class="grey">Si tu achètes ' + bilanCycle({ achat: a, vente: v2 }, c).nb + ' articles comme ça</p>';
+      for (const [txt, part] of [['Tu vends tout', 1], ['Tu en vends 7 sur 10', 0.7], ['Tu en vends 4 sur 10', 0.4]]) {
+        const b = bilanCycle({ achat: a, vente: v2, partVendue: part }, c), ok = b.resultat >= 0;
+        h += '<details><summary><span class="row"><span class="dot" style="background:' + (ok ? '#1e7a3c' : '#b91c1c') + '"></span>' + txt + '</span><b>' + (ok ? '+ ' : '− ') + eur(Math.abs(b.resultat)) + '</b></summary><p class="why">' + b.vendus + ' articles vendus. Tu as dépensé ' + eur(b.depense) + ' (articles, emballage, trajets). Tu as reçu ' + eur(b.encaisse) + ' après cotisations.</p></details>';
+      }
+      h += '<p class="grey">Ce sont des calculs sur un exemple. Ce n\'est pas une promesse.</p></div>';
+    }
+  }
+  out.innerHTML = h;
+}
+const cap = document.getElementById('cap');
+function setCap(n) { if (!Number.isFinite(n) || n < 0) n = 0; config.depart.capital_total_eur.valeur = n; cap.value = n; save(); render(); }
+cap.addEventListener('input', () => { const n = parseFloat(cap.value); config.depart.capital_total_eur.valeur = Number.isFinite(n) && n >= 0 ? n : 0; save(); render(); });
+document.getElementById('moins').addEventListener('click', () => setCap(config.depart.capital_total_eur.valeur - 10));
+document.getElementById('plus').addEventListener('click', () => setCap(config.depart.capital_total_eur.valeur + 10));
+document.getElementById('params').innerHTML = P.map(([lab, [a, b], step], i) => '<label for="p' + i + '">' + lab + '<input id="p' + i + '" type="number" inputmode="decimal" min="0" step="' + step + '" value="' + config[a][b].valeur + '"></label>').join('');
+P.forEach(([, [a, b]], i) => document.getElementById('p' + i).addEventListener('input', (e) => { const n = parseFloat(e.target.value); if (Number.isFinite(n) && n >= 0) { config[a][b].valeur = n; save(); render();
+    if (CLOUD && role === 'admin' && a !== 'exemple') sb.from('reglages').update({ valeur: n, hypothese: false, source: 'Modifié par l\'Admin', date_source: auj(), maj_le: new Date().toISOString() }).eq('domaine', a).eq('cle', b).then(() => {}); } }));
+cap.value = config.depart.capital_total_eur.valeur; render();
+
+// ---------- Journal ----------
+// Journal des achats et des ventes. Fonctions pures : (état, action, config) -> nouvel état.
+// L'argent ne vient QUE du journal : apports, achats, dépenses, ventes payées.
+const val = (x) => x.valeur;
+const somme = (xs) => r2(xs.reduce((a, b) => a + b, 0));
+const STATUTS = ['acheté', 'récupéré', 'photographié', 'en ligne', 'vendu', 'expédié', 'livré', 'payé'];
+const rang = (s) => STATUTS.indexOf(s);
+const etatVide = () => ({ seq: 0, apports: [], depenses: [], articles: [] });
+const copie = (e) => JSON.parse(JSON.stringify(e));
+function montant(n, nom = 'Montant') { if (!Number.isFinite(n) || n <= 0) throw new Error(nom + ' invalide'); return r2(n); }
+function jour(d) { if (!/^\d{4}-\d{2}-\d{2}$/.test(d || '')) throw new Error('Date invalide'); return d; }
+
+function bilan(etat, c, aujourdhui) {
+  const apports = somme(etat.apports.map((a) => a.montant));
+  const achats = somme(etat.articles.map((a) => a.achat.prix));
+  const dep = (t) => somme(etat.depenses.filter((d) => d.type === t).map((d) => d.montant));
+  const depenses = somme(etat.depenses.map((d) => d.montant));
+  const payes = etat.articles.filter((a) => a.statut === 'payé');
+  const encaisse = somme(payes.map((a) => a.vente.prix));
+  const aRecevoir = somme(etat.articles.filter((a) => a.vente && a.statut !== 'payé').map((a) => a.vente.prix));
+  const fraisVinted = r2(encaisse * val(c.vinted.frais_vendeur_pct) / 100);
+  const cotisations = r2(encaisse * val(c.statut.cotisations_pct_du_prix_de_vente) / 100);
+  const tresorerie = r2(apports - achats - depenses + encaisse - fraisVinted);
+  const reserve = r2(apports * val(c.depart.reserve_pct_du_capital) / 100);
+  const resteTransport = Math.max(0, r2(val(c.depart.tickets_premier_cycle) * val(c.transport.ticket_metro_eur) - dep('transport')));
+  const resteMateriel = Math.max(0, r2(val(c.depart.materiel_eur) - dep('materiel')));
+  const disponible = r2(tresorerie - cotisations - reserve - resteTransport - resteMateriel);
+  const enStock = etat.articles.filter((a) => rang(a.statut) < rang('vendu'));
+  const stockImmobilise = somme(enStock.map((a) => a.achat.prix));
+  const maxParArticle = r2(Math.max(0, disponible + stockImmobilise) * val(c.securite.max_pct_du_stock_par_article) / 100);
+  const benefice = r2(encaisse - fraisVinted - cotisations - somme(payes.map((a) => a.achat.prix)) - depenses);
+  const compares = etat.articles.filter((a) => a.vente && a.achat.venteEstimee > 0);
+  const erreurMoyennePct = compares.length ? Math.round(compares.reduce((s, a) => s + Math.abs(a.vente.prix - a.achat.venteEstimee) / a.achat.venteEstimee, 0) / compares.length * 100) : null;
+  const dorment = aujourdhui ? etat.articles.filter((a) => a.statut === 'en ligne' && (Date.parse(aujourdhui) - Date.parse(a.dateStatut)) / 864e5 >= val(c.securite.jours_avant_alerte_stock)) : [];
+  return { apports, achats, depenses, encaisse, aRecevoir, fraisVinted, cotisations, tresorerie, reserve, resteTransport, resteMateriel, disponible,
+    stockImmobilise, maxParArticle, benefice, nbEnStock: enStock.length, nbVendus: etat.articles.filter((a) => a.vente).length, erreurMoyennePct, dorment };
+}
+
+function ajouterApport(etat, { montant: m, date }) { const e = copie(etat); e.apports.push({ montant: montant(m), date: jour(date) }); return e; }
+
+function ajouterDepense(etat, { type, montant: m, date, note = '' }) {
+  if (!['transport', 'materiel', 'autre'].includes(type)) throw new Error('Type de dépense inconnu');
+  const e = copie(etat); e.depenses.push({ type, montant: montant(m), date: jour(date), note }); return e;
+}
+
+// Achat : refusé si l'argent manque ou si l'article dépasse le maximum (sauf accord de l'Admin : force).
+function ajouterAchat(etat, { nom, prix, date, origine, venteEstimee = 0, force = false }, c) {
+  if (!nom || !nom.trim()) throw new Error('Il manque le nom de l\'article');
+  if (!origine || !origine.trim()) throw new Error('Il manque où tu l\'as acheté');
+  const p = montant(prix, 'Prix'), b = bilan(etat, c);
+  if (p > b.disponible) throw new Error('Tu n\'as pas assez d\'argent.');
+  if (p > b.maxParArticle && !force) throw new Error('Trop cher. Maximum ' + b.maxParArticle.toFixed(2).replace('.', ',') + ' €.');
+  const e = copie(etat); e.seq += 1;
+  e.articles.push({ id: e.seq, nom: nom.trim(), statut: 'acheté', dateStatut: jour(date), achat: { prix: p, date, origine: origine.trim(), venteEstimee: r2(venteEstimee) || 0, force }, vente: null });
+  return e;
+}
+
+// Étape suivante. Pour passer à « vendu », il faut le prix : utiliser vendre().
+function avancer(etat, id, date) {
+  const e = copie(etat), a = e.articles.find((x) => x.id === id);
+  if (!a) throw new Error('Article introuvable');
+  const suivant = STATUTS[rang(a.statut) + 1];
+  if (!suivant) throw new Error('Cet article est déjà payé');
+  if (suivant === 'vendu') throw new Error('Indique le prix de vente');
+  a.statut = suivant; a.dateStatut = jour(date); return e;
+}
+
+function vendre(etat, id, { prix, date }) {
+  const e = copie(etat), a = e.articles.find((x) => x.id === id);
+  if (!a) throw new Error('Article introuvable');
+  if (a.statut !== 'en ligne') throw new Error('L\'article doit être en ligne avant d\'être vendu');
+  a.vente = { prix: montant(prix, 'Prix'), date: jour(date) }; a.statut = 'vendu'; a.dateStatut = date; return e;
+}
+
+// Vente annulée ou retour : l'article revient en ligne, l'argent n'est plus compté.
+function annulerVente(etat, id, date) {
+  const e = copie(etat), a = e.articles.find((x) => x.id === id);
+  if (!a || !a.vente) throw new Error('Aucune vente à annuler');
+  a.vente = null; a.statut = 'en ligne'; a.dateStatut = jour(date); return e;
+}
+
+const csv = (x) => '"' + String(x ?? '').replace(/"/g, '""') + '"';
+// Export pour le comptable et base du registre des objets : une ligne par article.
+function exportCSV(etat) {
+  const lignes = [['N°', 'Article', 'Date achat', 'Acheté où / à qui', 'Prix achat', 'Statut', 'Date vente', 'Prix vente']];
+  for (const a of etat.articles) lignes.push([a.id, a.nom, a.achat.date, a.achat.origine, a.achat.prix.toFixed(2), a.statut, a.vente?.date ?? '', a.vente ? a.vente.prix.toFixed(2) : '']);
+  return lignes.map((l) => l.map(csv).join(';')).join('\n');
+}
+
+const JKEY = 'dionysiades-journal';
+let etat = etatVide(), formulaire = null, erreur = '', csvVisible = false;
+try { const s = JSON.parse(localStorage.getItem(JKEY) || 'null'); if (s && Array.isArray(s.articles) && Array.isArray(s.apports) && Array.isArray(s.depenses)) etat = s; } catch (e) {}
+const auj = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+function agir(f) { let nv; try { nv = f(); } catch (e) { erreur = e.message; renderJournal(); return; }
+  if (!CLOUD) { etat = nv; erreur = ''; formulaire = null; try { localStorage.setItem(JKEY, JSON.stringify(etat)); } catch (e) {} renderJournal(); return; }
+  envoyer(ecritures(etat, nv), () => { erreur = ''; formulaire = null; }, (m) => { erreur = m; }); }
+const num = (id) => parseFloat((document.getElementById(id) || {}).value);
+const txt = (id) => ((document.getElementById(id) || {}).value || '');
+const FORMS = {
+  achat: { titre: 'J\'ai acheté', champs: [['f-nom', 'C\'est quoi ?', 'text'], ['f-prix', 'Payé combien ? (€)', 'number'], ['f-ou', 'Acheté où, ou à qui ?', 'text'], ['f-est', 'Prix de vente prévu (€)', 'number']],
+    ok: () => { if (!achatsAutorises(faites)) throw new Error('Fais d\'abord tes 4 démarches.'); return ajouterAchat(etat, { nom: txt('f-nom'), prix: num('f-prix'), date: auj(), origine: txt('f-ou'), venteEstimee: num('f-est') || 0 }, config); } },
+  apport: { titre: 'J\'ai mis de l\'argent', champs: [['f-prix', 'Combien ? (€)', 'number']], ok: () => ajouterApport(etat, { montant: num('f-prix'), date: auj() }) },
+  transport: { titre: 'J\'ai payé un trajet', champs: [['f-prix', 'Combien ? (€)', 'number']], ok: () => ajouterDepense(etat, { type: 'transport', montant: num('f-prix'), date: auj() }) },
+  materiel: { titre: 'J\'ai acheté du matériel', champs: [['f-prix', 'Combien ? (€)', 'number'], ['f-nom', 'C\'est quoi ?', 'text']], ok: () => ajouterDepense(etat, { type: 'materiel', montant: num('f-prix'), date: auj(), note: txt('f-nom') }) } };
+function renderJournal() {
+  const o = document.getElementById('j-out'), b = bilan(etat, config, auj());
+  let h = '<p class="grey">Ces données restent sur cet appareil pour l\'instant.</p>';
+  if (!etat.apports.length) h += '<div class="card"><p class="big">Commence ici.</p><p>Dis-moi combien tu as mis.</p></div>';
+  else {
+    const neg = b.disponible <= 0;
+    h += '<div class="card' + (neg ? ' alert' : '') + '"><p class="grey">Tu peux dépenser</p><p class="big">' + eur(Math.max(0, b.disponible)) + '</p><p>Jamais plus de <b>' + eur(b.maxParArticle) + '</b> pour un article.</p>'
+      + '<details><summary><span>Pourquoi ?</span><span class="grey">Voir le calcul</span></summary><p class="why">En caisse : ' + eur(b.tresorerie) + '.</p><p class="why">On enlève : ' + eur(b.reserve) + ' (on n\'y touche pas), ' + eur(b.resteTransport) + ' (trajets à venir), ' + eur(b.resteMateriel) + ' (matériel à venir), ' + eur(b.cotisations) + ' (cotisations à payer).</p></details></div>';
+    for (const a of b.dorment) h += '<div class="card"><div class="row"><div class="dot" style="background:#b45309"></div><p><b>' + esc(a.nom) + '</b> ne se vend pas depuis ' + config.securite.jours_avant_alerte_stock.valeur + ' jours. Baisse le prix.</p></div></div>';
+  }
+  if (formulaire) { const f = FORMS[formulaire];
+    h += '<div class="card"><p class="big">' + f.titre + '</p>' + f.champs.map(([id, lab, type]) => '<label for="' + id + '">' + lab + '<input id="' + id + '" type="' + type + '"' + (type === 'number' ? ' inputmode="decimal" min="0" step="0.5"' : '') + '></label>').join('')
+      + (erreur ? '<p class="err">' + esc(erreur) + '</p>' : '') + '<button type="button" class="btn go" data-ok="1">C\'est noté</button><button type="button" class="btn" data-form="">Annuler</button></div>';
+  } else h += '<div class="grid">' + (etat.apports.length ? (achatsAutorises(faites) ? '<button type="button" class="btn go" data-form="achat" style="grid-column:1/3">J\'ai acheté</button>' : '<p class="grey" style="grid-column:1/3">Les achats s\'ouvrent après tes 4 démarches. Regarde « Aujourd\'hui ».</p>') + '<button type="button" class="btn" data-form="transport">J\'ai payé un trajet</button><button type="button" class="btn" data-form="materiel">Matériel</button>' : '') + '<button type="button" class="btn' + (etat.apports.length ? '' : ' go') + '" data-form="apport" style="grid-column:1/3">J\'ai mis de l\'argent</button></div>' + (erreur ? '<p class="err">' + esc(erreur) + '</p>' : '');
+  if (etat.articles.length) { h += '<div class="card"><p class="grey">Mes articles</p>';
+    for (const a of etat.articles.slice().reverse()) { const suiv = STATUTS[STATUTS.indexOf(a.statut) + 1];
+      h += '<div class="art"><div class="row" style="justify-content:space-between"><b>' + esc(a.nom) + '</b><span class="tag' + (a.statut === 'payé' ? ' ok' : '') + '">' + a.statut + '</span></div><p class="grey">Acheté ' + eur(a.achat.prix) + (a.vente ? ' · vendu ' + eur(a.vente.prix) : '') + '</p>';
+      if (a.statut === 'en ligne') h += '<label for="v' + a.id + '">Vendu combien ? (€)<input id="v' + a.id + '" type="number" inputmode="decimal" min="0" step="0.5"></label><button type="button" class="btn go" data-vendre="' + a.id + '">C\'est vendu</button>';
+      else if (suiv) h += '<button type="button" class="btn" data-avancer="' + a.id + '">C\'est ' + suiv + '</button>';
+      if (a.vente && a.statut !== 'payé') h += '<button type="button" class="btn" data-annuler="' + a.id + '">La vente est annulée</button>';
+      h += '</div>'; }
+    h += '</div>'; }
+  if (etat.apports.length) h += '<details class="card adm"><summary><b>Tous les chiffres (Admin)</b><span class="grey">Ouvrir</span></summary>'
+    + [['Argent mis', b.apports], ['Achats d\'articles', b.achats], ['Trajets, matériel, autres', b.depenses], ['Ventes payées', b.encaisse], ['Ventes à recevoir', b.aRecevoir], ['Cotisations à payer', b.cotisations], ['Frais Vinted', b.fraisVinted], ['En caisse', b.tresorerie], ['Stock pas encore vendu', b.stockImmobilise], ['Bénéfice sur les ventes payées', b.benefice]].map(([l, n]) => '<div class="row" style="justify-content:space-between"><span>' + l + '</span><b>' + (n < 0 ? '− ' : '') + eur(Math.abs(n)) + '</b></div>').join('')
+    + '<p class="grey">' + b.nbEnStock + ' en stock · ' + b.nbVendus + ' vendus · erreur moyenne des prix prévus : ' + (b.erreurMoyennePct === null ? 'pas encore de vente' : b.erreurMoyennePct + ' %') + '</p>'
+    + '<button type="button" class="btn" data-csv="1">Copier pour le comptable</button>' + (csvVisible ? '<textarea readonly aria-label="Journal au format CSV">' + esc(exportCSV(etat)) + '</textarea>' : '') + '</details>';
+  o.innerHTML = h;
+}
+document.getElementById('j-out').addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d) return;
+  if ('form' in d) { formulaire = d.form || null; erreur = ''; renderJournal(); }
+  else if (d.ok) agir(FORMS[formulaire].ok);
+  else if (d.avancer) agir(() => avancer(etat, +d.avancer, auj()));
+  else if (d.vendre) agir(() => vendre(etat, +d.vendre, { prix: num('v' + d.vendre), date: auj() }));
+  else if (d.annuler) agir(() => annulerVente(etat, +d.annuler, auj()));
+  else if (d.csv) { csvVisible = true; renderJournal(); try { navigator.clipboard.writeText(exportCSV(etat)).catch(() => {}); } catch (e) {} } });
+// Plan de démarrage sur 30 jours. Une étape = une seule chose à faire.
+// cout : clé de la config (montant sourcé ou hypothèse) ou null = gratuit ou inconnu, dit dans coutTexte.
+const ETAPES = [
+  { id: 'entreprise', semaine: 1, titre: 'Crée ton entreprise.', pourquoi: 'Sans entreprise, tu n\'as pas le droit d\'acheter pour revendre.', coutTexte: 'Prix à vérifier.', minutes: 45, lien: 'https://formalites.entreprises.gouv.fr', source: 'https://www.economie.gouv.fr/entreprises/comment-creer-une-micro-entreprise' },
+  { id: 'siret', semaine: 1, titre: 'Note ton numéro SIRET.', pourquoi: 'Vinted et la préfecture te le demandent.', coutTexte: 'Gratuit.', minutes: 5, source: 'https://www.vinted.fr/pro' },
+  { id: 'declaration', semaine: 1, titre: 'Déclare ton activité de revente.', pourquoi: 'C\'est obligatoire avant ton premier achat.', coutTexte: 'Prix à vérifier.', minutes: 20, lien: 'https://entreprendre.service-public.gouv.fr/vosdroits/F39552', source: 'https://entreprendre.service-public.gouv.fr/vosdroits/F39552' },
+  { id: 'vintedpro', semaine: 1, titre: 'Crée ton compte Vinted Pro.', pourquoi: 'Vinted peut bloquer un vendeur pro non déclaré.', coutTexte: 'Gratuit.', minutes: 15, lien: 'https://www.vinted.fr/pro', source: 'https://www.vinted.fr/pro' },
+  { id: 'materiel', semaine: 1, titre: 'Achète ton matériel.', pourquoi: 'Il te faut du ruban adhésif et un mètre.', cout: ['depart', 'materiel_eur'], minutes: 30 },
+  { id: 'tri', semaine: 1, titre: 'Choisis 10 affaires à toi à vendre.', pourquoi: 'Tu apprends à vendre sans dépenser d\'argent.', coutTexte: 'Gratuit.', minutes: 60 },
+  { id: 'photos', semaine: 1, titre: 'Publie tes 3 premiers articles.', pourquoi: 'Tu t\'entraînes aux photos et aux annonces.', coutTexte: 'Gratuit.', minutes: 60 },
+  { id: 'reste', semaine: 2, titre: 'Publie tes 7 autres articles.', pourquoi: 'Plus d\'articles en ligne, plus de chances de vendre.', coutTexte: 'Gratuit.', minutes: 120 },
+  { id: 'messages', semaine: 2, titre: 'Réponds aux acheteurs chaque jour.', pourquoi: 'Une réponse rapide aide à vendre.', coutTexte: 'Gratuit.', minutes: 15 },
+  { id: 'colis', semaine: 2, titre: 'Envoie ton premier colis.', pourquoi: 'Tu apprends à emballer et à déposer.', coutTexte: 'L\'acheteur paie l\'envoi.', minutes: 30, source: 'https://www.vinted.fr/help/342' },
+  { id: 'achat1', semaine: 3, titre: 'Fais ton premier achat test.', pourquoi: 'Un seul article, pour vérifier que les feux marchent.', coutTexte: 'Jamais plus que le maximum par article.', minutes: 90 },
+  { id: 'achats', semaine: 3, titre: 'Achète plusieurs articles en un seul trajet.', pourquoi: 'Un trajet pour un seul article coûte trop cher.', cout: ['transport', 'ticket_metro_eur'], coutTexte: 'par ticket, plus les articles.', minutes: 180 },
+  { id: 'prix', semaine: 4, titre: 'Baisse le prix de ce qui dort.', pourquoi: 'Un article invendu bloque ton argent.', coutTexte: 'Gratuit.', minutes: 20 },
+  { id: 'urssaf', semaine: 4, titre: 'Déclare tes ventes à l\'Urssaf.', pourquoi: 'C\'est obligatoire, même pour une petite somme.', coutTexte: 'Les cotisations déjà mises de côté.', minutes: 15, lien: 'https://www.autoentrepreneur.urssaf.fr', source: 'https://entreprendre.service-public.gouv.fr/vosdroits/F37353' },
+  { id: 'bilan', semaine: 4, titre: 'Fais le bilan avec Cyrille.', pourquoi: 'On décide : continuer, changer, ou arrêter.', coutTexte: 'Gratuit.', minutes: 30 },
+];
+const AVANT_ACHAT = ['entreprise', 'siret', 'declaration', 'vintedpro'];
+const prochaineEtape = (faites) => ETAPES.find((e) => !faites.includes(e.id)) || null;
+const achatsAutorises = (faites) => AVANT_ACHAT.every((id) => faites.includes(id));
+const avancement = (faites) => { const n = ETAPES.filter((e) => faites.includes(e.id)).length; return { faites: n, total: ETAPES.length, pct: Math.round(n / ETAPES.length * 100) }; };
+// On ne peut valider que l'étape en cours : pas de saut.
+function valider(faites, id) { const p = prochaineEtape(faites); if (!p || p.id !== id) throw new Error('Fais d\'abord l\'étape en cours'); return [...faites, id]; }
+
+const PKEY = 'dionysiades-plan';
+let faites = [];
+try { const s = JSON.parse(localStorage.getItem(PKEY) || 'null'); if (Array.isArray(s)) faites = s.filter((id) => ETAPES.some((e) => e.id === id)); } catch (e) {}
+const BRAVOS = ['Bravo, c\'est parti !', 'Super, continue !', 'Encore une de faite !', 'Tu avances bien !'];
+function renderAujourdhui() {
+  const o = document.getElementById('a-out'), p = prochaineEtape(faites), av = avancement(faites), b = bilan(etat, config, auj());
+  let h = '<div class="card"><div class="bar"><div style="width:' + av.pct + '%"></div></div><p class="grey">' + av.faites + ' étapes faites sur ' + av.total + (av.faites ? '. ' + BRAVOS[av.faites % BRAVOS.length] : '.') + '</p></div>';
+  if (p) { const c = p.cout ? eur(config[p.cout[0]][p.cout[1]].valeur) + (p.coutTexte ? ' ' + p.coutTexte : '') : p.coutTexte;
+    h += '<div class="card"><p class="grey">Semaine ' + p.semaine + ' · à faire maintenant</p><p class="big">' + esc(p.titre) + '</p><p>' + esc(p.pourquoi) + '</p>'
+      + '<div class="row" style="justify-content:space-between"><span class="grey">Coût</span><b>' + esc(c) + '</b></div><div class="row" style="justify-content:space-between"><span class="grey">Temps</span><b>environ ' + p.minutes + ' min</b></div>'
+      + (p.lien ? '<a class="ext" href="' + esc(p.lien) + '" target="_blank" rel="noopener">Ouvrir le site</a>' : '')
+      + '<button type="button" class="btn go" data-fait="' + p.id + '">C\'est fait</button>'
+      + '<details><summary><span>D\'où ça vient ?</span><span class="grey">Voir</span></summary><p class="why">' + (p.source ? 'Source : ' + esc(p.source) : 'Conseil du plan de démarrage. Le temps indiqué est une estimation.') + '</p><p class="why">À faire valider par un professionnel pour les démarches.</p></details></div>';
+  } else h += '<div class="card"><p class="big">Les 30 jours sont finis.</p><p>Regarde ton journal avec Cyrille.</p></div>';
+  const aExp = etat.articles.filter((a) => a.statut === 'vendu').length, aPub = etat.articles.filter((a) => ['acheté', 'récupéré', 'photographié'].includes(a.statut)).length;
+  h += '<div class="card"><a class="tile" href="#releve"><span>Relevé du jour</span><b>' + (faitAujourdhui(releves, auj()) ? 'Fait' : 'À faire') + '</b></a></div><div class="card"><a class="tile" href="#chercher"><span>À chercher</span><b>Voir</b></a></div>';
+  h += '<div class="card"><a class="tile" href="#journal"><span>À acheter</span><b>' + (achatsAutorises(faites) ? eur(Math.max(0, b.disponible)) : 'Pas encore') + '</b></a></div>'
+    + '<div class="card"><a class="tile" href="#journal"><span>À expédier</span><b>' + aExp + ' colis</b></a></div>'
+    + '<div class="card"><a class="tile" href="#journal"><span>À publier</span><b>' + aPub + ' article' + (aPub > 1 ? 's' : '') + '</b></a></div>';
+  o.innerHTML = h;
+}
+document.getElementById('a-out').addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d || !d.fait) return;
+  let nf; try { nf = valider(faites, d.fait); } catch (e) { return; }
+  if (!CLOUD) { faites = nf; try { localStorage.setItem(PKEY, JSON.stringify(faites)); } catch (e) {} renderAujourdhui(); renderJournal(); return; }
+  envoyer([{ table: 'plan_etapes', type: 'insert', ligne: { etape_id: d.fait } }], () => {}, () => {}); });
+// Relevé du jour : ce qu'elle voit vraiment sur Vinted corrige les scores de l'agent.
+const NIVEAUX = ['peu', 'moyen', 'beaucoup'];
+const jourN = (d) => Math.floor(Date.parse(d) / 864e5);
+const mediane = (xs) => { const s = [...xs].sort((a, b) => a - b), m = s.length >> 1; return s.length % 2 ? s[m] : Math.round((s[m - 1] + s[m]) * 50) / 100; };
+
+// Quelle recherche faire aujourd'hui ? On tourne dans la liste pour tout couvrir, une par jour.
+function aRelever(tendances, releves, date) {
+  if (!tendances.length) return null;
+  const tri = [...tendances].sort((a, b) => b.score - a.score), k = jourN(date) % tri.length;
+  const ordre = [...tri.slice(k), ...tri.slice(0, k)];
+  return ordre.find((t) => !releves.some((r) => r.date === date && r.nom === t.nom)) || null;
+}
+const faitAujourdhui = (releves, date) => releves.some((r) => r.date === date);
+
+function ajouterReleve(releves, { date, nom, offre, interet, prix }) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '')) throw new Error('Date invalide');
+  if (!nom) throw new Error('Il manque l\'article');
+  if (!NIVEAUX.includes(offre) || !NIVEAUX.includes(interet)) throw new Error('Choisis une réponse');
+  if (!Number.isFinite(prix) || prix <= 0) throw new Error('Écris un prix');
+  if (releves.some((r) => r.date === date && r.nom === nom)) throw new Error('Déjà relevé aujourd\'hui');
+  return [...releves, { date, nom, offre, interet, prix: Math.round(prix * 100) / 100 }];
+}
+
+// Score corrigé par le réel. Beaucoup de cœurs et peu d'annonces = ça monte. Un seul relevé ne change rien.
+function synthese(tendance, releves, date, c) {
+  const fen = c.releve.jours_fenetre.valeur, min = c.releve.min_releves.valeur, pts = c.releve.points_par_cran.valeur;
+  const rs = releves.filter((r) => r.nom === tendance.nom && jourN(date) - jourN(r.date) >= 0 && jourN(date) - jourN(r.date) < fen);
+  const confirme = rs.length >= min;
+  const ecart = rs.length ? rs.reduce((s, r) => s + NIVEAUX.indexOf(r.interet) - NIVEAUX.indexOf(r.offre), 0) / rs.length : 0;
+  const ajustement = confirme ? Math.round(ecart * pts) : 0;
+  return { nom: tendance.nom, scoreAgent: tendance.score, nbReleves: rs.length, confirme, ajustement,
+    score: Math.max(0, Math.min(100, tendance.score + ajustement)), prixCourant: rs.length ? mediane(rs.map((r) => r.prix)) : null };
+}
+const classement = (tendances, releves, date, c) => tendances.map((t) => ({ ...t, ...synthese(t, releves, date, c) })).sort((a, b) => b.score - a.score);
+
+let TENDANCES = [
+ {
+  "nom": "Jouets et jeux en bon état",
+  "score": 85,
+  "raison": "Noël approche et l'occasion s'offre de plus en plus",
+  "confiance": "forte",
+  "source": "https://www.economiematin.fr/?p=238267",
+  "date": "2026-11-26",
+  "recherche": "jeu de société"
+ },
+ {
+  "nom": "Livres, BD, jeux vidéo",
+  "score": 80,
+  "raison": "Cadeaux d'occasion les plus acceptés",
+  "confiance": "forte",
+  "source": "https://www.ipsos.com/fr-fr/un-francais-sur-trois-utilise-lia-pour-preparer-ses-achats-de-noel",
+  "date": "2026-11-26",
+  "recherche": "BD"
+ },
+ {
+  "nom": "Pulls, sweats, mailles",
+  "score": 70,
+  "raison": "Ce qui se porte en hiver part en décembre",
+  "confiance": "moyenne",
+  "source": "https://friptadium.com/blogs/actualites/vendre-vinted-noel-strategie-revendeur",
+  "date": "2026-11-26",
+  "recherche": "pull laine"
+ },
+ {
+  "nom": "Jeans et pantalons de marque",
+  "score": 65,
+  "raison": "Très achetés d'occasion toute l'année",
+  "confiance": "moyenne",
+  "source": "https://fashionunited.fr/actualite/retail/vinted-est-le-plus-grand-detaillant-de-mode-en-france/2025051538119",
+  "date": "2026-11-26",
+  "recherche": "jean"
+ },
+ {
+  "nom": "Tenues de fête",
+  "score": 60,
+  "raison": "La demande monte avant les réveillons",
+  "confiance": "faible",
+  "source": "https://fripio.app/blog/vendre-noel-fetes-vinted-2026",
+  "date": "2026-11-26",
+  "recherche": "robe de soirée"
+ },
+ {
+  "nom": "Vêtements d'enfants chauds",
+  "score": 55,
+  "raison": "Besoin de saison, à la bonne taille",
+  "confiance": "faible",
+  "source": "https://vintedcrm.com/ressources/quoi-vendre-vinted-automne-hiver-2026/",
+  "date": "2026-11-26",
+  "recherche": "manteau enfant"
+ },
+ {
+  "nom": "Manteaux et doudounes",
+  "score": 40,
+  "raison": "Demande forte mais trop chers et encombrants pour elle",
+  "confiance": "moyenne",
+  "source": "https://friptadium.com/pages/calendrier-meilleures-periodes-vente",
+  "date": "2026-11-26",
+  "recherche": "doudoune"
+ }
+];
+const RKEY = 'dionysiades-releves';
+let releves = [], rel = null, relErr = '';
+try { const s = JSON.parse(localStorage.getItem(RKEY) || 'null'); if (Array.isArray(s)) releves = s.filter((r) => r && r.nom && r.date && Number.isFinite(r.prix)); } catch (e) {}
+const choix = (k) => '<div class="grid" style="grid-template-columns:1fr 1fr 1fr">' + [['peu', 'Peu'], ['moyen', 'Moyen'], ['beaucoup', 'Beaucoup']].map(([v, l]) => '<button type="button" class="btn" data-' + k + '="' + v + '">' + l + '</button>').join('') + '</div>';
+function renderReleve() {
+  const o = document.getElementById('r-out'), n = releves.filter((r) => r.date === auj()).length;
+  if (!rel) { const t = aRelever(TENDANCES, releves, auj());
+    if (!t) { o.innerHTML = '<div class="card"><p class="big">Tout est relevé.</p><p>Merci ! À demain.</p></div>'; return; }
+    if (n) { o.innerHTML = '<div class="card"><p class="big">Merci, c\'est noté !</p><p>' + n + ' relevé' + (n > 1 ? 's' : '') + ' aujourd\'hui. Un seul suffit.</p><button type="button" class="btn" data-encore="1">J\'en fais un autre</button></div>'; return; }
+    rel = { nom: t.nom, recherche: t.recherche || t.nom, etape: 0 }; }
+  const pas = '<p class="grey">Question ' + (rel.etape + 1) + ' sur 4</p><div class="bar"><div style="width:' + (rel.etape + 1) * 25 + '%"></div></div>';
+  const corps = [
+    '<p class="big">Ouvre Vinted.</p><p>Tape dans la recherche :</p><p class="big">« ' + esc(rel.recherche) + ' »</p><p class="grey">Pour : ' + esc(rel.nom) + '</p><button type="button" class="btn go" data-suite="1">C\'est fait</button>',
+    '<p class="big">Il y a beaucoup d\'annonces ?</p>' + choix('offre'),
+    '<p class="big">Les 5 premières ont beaucoup de cœurs ?</p><p class="grey">Le cœur montre combien de gens aiment l\'article.</p>' + choix('interet'),
+    '<p class="big">Quel prix tu vois le plus souvent ?</p><label for="r-prix">Prix en euros<input id="r-prix" type="number" inputmode="decimal" min="0" step="0.5"></label>' + (relErr ? '<p class="err">' + esc(relErr) + '</p>' : '') + '<button type="button" class="btn go" data-fin="1">C\'est noté</button>'][rel.etape];
+  o.innerHTML = '<div class="card">' + pas + corps + '</div>';
+}
+document.getElementById('r-out').addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d) return;
+  if (d.encore) { const t = aRelever(TENDANCES, releves, auj()); rel = t ? { nom: t.nom, recherche: t.recherche || t.nom, etape: 0 } : null; if (!t) releves = releves.slice(); }
+  else if (!rel) return;
+  else if (d.suite) rel.etape = 1;
+  else if (d.offre) { rel.offre = d.offre; rel.etape = 2; }
+  else if (d.interet) { rel.interet = d.interet; rel.etape = 3; }
+  else if (d.fin) { let nr; try { nr = ajouterReleve(releves, { date: auj(), nom: rel.nom, offre: rel.offre, interet: rel.interet, prix: num('r-prix') }); } catch (e) { relErr = e.message; renderReleve(); return; }
+    if (!CLOUD) { releves = nr; rel = null; relErr = ''; try { localStorage.setItem(RKEY, JSON.stringify(releves)); } catch (e) {} }
+    else { const l = nr[nr.length - 1]; envoyer([{ table: 'releves', type: 'insert', ligne: l }], () => { rel = null; relErr = ''; }, (m) => { relErr = m; }); return; } }
+  renderReleve(); });
+function renderChercher() {
+  const o = document.getElementById('c-out'), b = bilan(etat, config, auj());
+  let h = '<p class="grey">Liste du ' + TENDANCES[0].date.split('-').reverse().join('/') + ', corrigée par tes relevés.</p>';
+  for (const t of classement(TENDANCES, releves, auj(), config)) {
+    const col = t.score >= 70 ? '#1e7a3c' : t.score >= 50 ? '#b45309' : '#b91c1c';
+    let prix = '<p class="grey">Fais le relevé pour connaître le prix.</p>';
+    if (t.prixCourant) { let m = prixAchatMax({ vente: t.prixCourant }, config); if (etat.apports.length) m = Math.min(m, b.maxParArticle);
+      prix = m > 0 ? '<p>Se vend autour de <b>' + eur(t.prixCourant) + '</b>. Paie au maximum <b>' + eur(m) + '</b>.</p>' : '<p>Se vend autour de <b>' + eur(t.prixCourant) + '</b>. Trop peu pour gagner : passe.</p>'; }
+    h += '<div class="card"><div class="row"><div class="dot" style="background:' + col + '"></div><p class="big">' + esc(t.nom) + '</p></div><p>' + esc(t.raison) + '.</p>' + prix
+      + '<details><summary><span>Pourquoi ?</span><span class="grey">Score ' + t.score + ' sur 100</span></summary><p class="why">Score de l\'agent : ' + t.scoreAgent + '. ' + (t.confirme ? 'Tes ' + t.nbReleves + ' relevés le changent de ' + (t.ajustement > 0 ? '+' : '') + t.ajustement + '.' : t.nbReleves ? 'Un relevé : il en faut ' + config.releve.min_releves.valeur + ' pour changer le score.' : 'Pas encore de relevé.') + '</p><p class="why">Confiance : ' + esc(t.confiance) + '. Source : ' + esc(t.source) + '</p></details></div>';
+  }
+  o.innerHTML = h;
+}
+function vue() { const N = ['aujourdhui', 'journal', 'argent', 'releve', 'chercher'];
+  const bloque = CLOUD && !pret; document.getElementById('v-connexion').hidden = !bloque; document.getElementById('nav').hidden = bloque;
+  if (bloque) { for (const n of N) document.getElementById('v-' + n).hidden = true; renderConnexion(); return; }
+  const h = N.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'aujourdhui';
+  for (const n of N) { document.getElementById('v-' + n).hidden = n !== h; const nav = document.getElementById('n-' + n); if (nav) nav.className = n === h ? 'on' : ''; }
+  if (h === 'aujourdhui') renderAujourdhui(); if (h === 'releve') renderReleve(); if (h === 'chercher') renderChercher(); }
+// ---------- Base de données (Supabase) : seulement quand l'application est à sa vraie adresse ----------
+// Passage entre la base (lignes Supabase) et l'état de l'application. Fonctions pures, testées.
+const n = (x) => (x === null || x === undefined ? null : Number(x));
+function articleDepuisLigne(l) {
+  return { id: l.id, nom: l.nom, statut: l.statut, dateStatut: l.date_statut,
+    achat: { prix: n(l.achat_prix), date: l.achat_date, origine: l.achat_origine, venteEstimee: n(l.vente_estimee) || 0, force: !!l.achat_force },
+    vente: l.vente_prix === null || l.vente_prix === undefined ? null : { prix: n(l.vente_prix), date: l.vente_date } };
+}
+function ligneDepuisArticle(a) {
+  return { nom: a.nom, statut: a.statut, date_statut: a.dateStatut, achat_prix: a.achat.prix, achat_date: a.achat.date, achat_origine: a.achat.origine,
+    vente_estimee: a.achat.venteEstimee || 0, achat_force: !!a.achat.force, vente_prix: a.vente ? a.vente.prix : null, vente_date: a.vente ? a.vente.date : null };
+}
+function etatDepuisLignes({ apports = [], depenses = [], articles = [] }) {
+  const parId = (a, b) => a.id - b.id;
+  return { seq: articles.reduce((m, a) => Math.max(m, a.id), 0),
+    apports: [...apports].sort(parId).map((a) => ({ montant: n(a.montant), date: a.date })),
+    depenses: [...depenses].sort(parId).map((d) => ({ type: d.type, montant: n(d.montant), date: d.date, note: d.note || '' })),
+    articles: [...articles].sort(parId).map(articleDepuisLigne) };
+}
+// Ce qui a changé entre deux états = les écritures à envoyer à la base.
+function ecritures(avant, apres) {
+  const ops = [];
+  for (const a of apres.apports.slice(avant.apports.length)) ops.push({ table: 'apports', type: 'insert', ligne: { montant: a.montant, date: a.date } });
+  for (const d of apres.depenses.slice(avant.depenses.length)) ops.push({ table: 'depenses', type: 'insert', ligne: { type: d.type, montant: d.montant, date: d.date, note: d.note || '' } });
+  const anciens = new Map(avant.articles.map((a) => [a.id, a]));
+  for (const a of apres.articles) { const o = anciens.get(a.id);
+    if (!o) ops.push({ table: 'articles', type: 'insert', ligne: ligneDepuisArticle(a) });
+    else if (JSON.stringify(ligneDepuisArticle(o)) !== JSON.stringify(ligneDepuisArticle(a))) { const l = ligneDepuisArticle(a);
+      ops.push({ table: 'articles', type: 'update', id: a.id, ligne: { statut: l.statut, date_statut: l.date_statut, vente_prix: l.vente_prix, vente_date: l.vente_date } }); } }
+  return ops;
+}
+// Les réglages de la base remplacent ceux livrés avec l'application. Une clé inconnue de l'application est ignorée.
+function configAvecReglages(base, lignes) {
+  const c = JSON.parse(JSON.stringify(base));
+  for (const l of lignes) { if (!c[l.domaine] || typeof c[l.domaine] !== 'object' || !c[l.domaine][l.cle]) continue; const v = n(l.valeur); if (!Number.isFinite(v)) continue;
+    const x = { valeur: v }; if (l.hypothese) x.hypothese = true; else { x.source = l.source; x.date = l.date_source; } if (l.note) x.note = l.note; c[l.domaine][l.cle] = x; }
+  return c;
+}
+// Les tendances affichées = celles du jour le plus récent présent dans la base.
+function tendancesRecentes(lignes) {
+  if (!lignes.length) return [];
+  const d = lignes.reduce((m, l) => (l.date > m ? l.date : m), '');
+  return lignes.filter((l) => l.date === d).map((l) => ({ nom: l.nom, recherche: l.recherche || l.nom, score: l.score, raison: l.raison, confiance: l.confiance, source: l.source, date: l.date })).sort((a, b) => b.score - a.score);
+}
+
+const CLOUD = typeof globalThis.__SB_TEST !== 'undefined' || /\.github\.io$/.test(location.hostname);
+const SB = { url: 'https://vthobytejlzfyedldsha.supabase.co', cle: 'sb_publishable_l_263RKA0dOAfc1dyABeVQ_xq_AHJO1' };
+let sb = null, pret = !CLOUD, role = 'admin', session = null, cloudMsg = '', lienEnvoye = false;
+const toutRendre = () => { renderJournal(); vue(); };
+async function charger() {
+  const T = ['apports', 'depenses', 'articles', 'plan_etapes', 'releves', 'tendances', 'reglages'];
+  const [m, ...r] = await Promise.all([sb.from('membres').select('role').eq('user_id', session.user.id).maybeSingle(), ...T.map((x) => sb.from(x).select('*'))]);
+  if (m.error || r.some((x) => x.error)) throw new Error('Pas de connexion. Réessaie.');
+  if (!m.data) { pret = false; role = null; cloudMsg = 'Ton compte n\'est pas encore invité. Demande à Cyrille.'; return; }
+  const [ap, de, ar, pl, re, te, rg] = r.map((x) => x.data);
+  role = m.data.role; etat = etatDepuisLignes({ apports: ap, depenses: de, articles: ar });
+  const f = pl.map((x) => x.etape_id); faites = ETAPES.map((e) => e.id).filter((id) => f.includes(id));
+  releves = re.map((x) => ({ date: x.date, nom: x.nom, offre: x.offre, interet: x.interet, prix: Number(x.prix) }));
+  const t = tendancesRecentes(te); if (t.length) TENDANCES = t;
+  const ex = config.exemple; config = configAvecReglages(CONFIG_BASE, rg); config.exemple = ex;
+  pret = true; cloudMsg = ''; document.body.classList.toggle('op', role !== 'admin'); document.getElementById('n-argent').hidden = role !== 'admin';
+}
+async function ecrire(ops) { for (const o of ops) { const q = o.type === 'insert' ? sb.from(o.table).insert(o.ligne) : sb.from(o.table).update(o.ligne).eq('id', o.id);
+  const { error } = await q; if (error) throw new Error('Pas enregistré. Vérifie ta connexion et réessaie.'); } }
+function envoyer(ops, ok, ko) { document.body.classList.add('attente');
+  return ecrire(ops).then(charger).then(ok).catch((e) => ko(e.message)).finally(() => { document.body.classList.remove('attente'); renderJournal(); renderReleve(); vue(); }); }
+function renderConnexion() { const o = document.getElementById('x-out');
+  o.innerHTML = lienEnvoye ? '<div class="card"><p class="big">Regarde tes mails.</p><p>Clique sur le lien dans le mail.</p></div>'
+    : '<div class="card"><p class="big">Bonjour.</p><label for="c-mail">Ton adresse mail<input id="c-mail" type="email" autocomplete="email"></label>' + (cloudMsg ? '<p class="err">' + esc(cloudMsg) + '</p>' : '') + '<button type="button" class="btn go" data-lien="1">Recevoir mon lien</button><p class="grey">Tu reçois un mail avec un lien. Pas de mot de passe.</p></div>'; }
+document.getElementById('x-out').addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d || !d.lien || !sb) return;
+  const email = txt('c-mail').trim(); if (!/^\S+@\S+\.\S+$/.test(email)) { cloudMsg = 'Écris ton adresse mail.'; renderConnexion(); return; }
+  sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false, emailRedirectTo: location.origin + location.pathname } }).then(({ error }) => { if (error) cloudMsg = 'Adresse inconnue ou pas de connexion.'; else { lienEnvoye = true; cloudMsg = ''; } renderConnexion(); }); });
+async function demarrerCloud() {
+  try { sb = globalThis.__SB_TEST || (await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')).createClient(SB.url, SB.cle);
+    sb.auth.onAuthStateChange((_e, s) => { session = s; setTimeout(() => { if (!s) { pret = false; toutRendre(); return; } charger().catch((e) => { pret = false; cloudMsg = e.message; }).finally(toutRendre); }, 0); });
+  } catch (e) { cloudMsg = 'Pas de connexion. Recharge la page.'; toutRendre(); }
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+window.addEventListener('hashchange', vue); renderJournal(); vue(); if (CLOUD) demarrerCloud();
+</script>
+</body>
+</html>
