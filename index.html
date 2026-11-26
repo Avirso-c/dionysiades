@@ -50,6 +50,31 @@ textarea{width:100%;min-height:120px;font:13px ui-monospace,monospace;border-rad
 a.tile{display:flex;justify-content:space-between;align-items:center;gap:12px;text-decoration:none;color:#14181d}
 a.tile b{font-size:22px}
 a.ext{color:#14181d;font-weight:700}
+.coach{margin:0;font-size:18px;min-height:50px}
+.scene{position:relative;height:300px;perspective:1000px;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
+.rail{position:absolute;left:50%;top:14px;width:280px;height:64px;margin-left:-140px;border:2px solid rgba(20,24,29,.35);border-radius:50%;transform:rotateX(72deg);box-shadow:0 0 24px rgba(255,255,255,.9)}
+.ring{position:absolute;left:50%;top:42px;width:0;height:0;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.ring.drag{transition:none}
+.piece{position:absolute;left:-70px;top:0;width:140px;transform-style:preserve-3d;transition:opacity .4s}
+.swing{transform-origin:50% 0;animation:sway 4.5s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotateZ(-1.6deg)}50%{transform:rotateZ(1.6deg)}}
+.hook{width:2px;height:20px;background:#14181d;margin:0 auto;opacity:.6}
+.hanger{display:block;margin:-2px auto -6px}
+.etq{border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.66);box-shadow:0 14px 34px rgba(20,24,29,.18);border-radius:22px;padding:10px 8px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;backface-visibility:hidden}
+.etq span{font-size:13px;font-weight:700;text-align:center;line-height:1.2;min-height:32px}
+.floor{position:absolute;left:50%;bottom:-6px;width:320px;height:56px;margin-left:-160px;border-radius:50%;background:radial-gradient(closest-side,rgba(20,24,29,.20),rgba(20,24,29,0))}
+.navb{display:flex;gap:10px;align-items:center}
+.navb button{flex:none;width:56px;height:56px;border-radius:18px;border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.7);font-size:26px;font-weight:700;color:#14181d;cursor:pointer}
+.navb p{flex:1;text-align:center}
+a.go,a.sec{display:flex;align-items:center;justify-content:center;border-radius:18px;font-weight:700;text-decoration:none}
+a.go{min-height:62px;background:#1e7a3c;color:#fff;font-size:19px}
+a.sec{min-height:52px;border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.75);color:#14181d;font-size:17px}
+.pills{display:flex;gap:8px}
+.pills a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:56px;justify-content:center;border-radius:16px;border:1px solid rgba(255,255,255,.95);background:rgba(255,255,255,.5);color:#14181d;text-decoration:none;font-size:13px}
+.pills a b{font-size:17px}
+.btn.sel{border-color:#14181d;background:#14181d0d}
+.msg{background:#fff;border-radius:14px;padding:12px;font-size:17px;border:1px solid rgba(20,24,29,.15)}
+@media (prefers-reduced-motion:reduce){.swing{animation:none}.ring{transition:none}}
 .op .adm{display:none!important}
 body.attente main{opacity:.6;pointer-events:none}
 </style>
@@ -57,9 +82,14 @@ body.attente main{opacity:.6;pointer-events:none}
 <body>
 <main>
 <p class="app">Les Dionysiades</p>
-<nav id="nav"><a href="#aujourdhui" id="n-aujourdhui">Aujourd'hui</a><a href="#journal" id="n-journal">Journal</a><a href="#argent" id="n-argent" class="adm-nav">Et si…</a></nav>
+<nav id="nav"><a href="#aujourdhui" id="n-aujourdhui">Accueil</a><a href="#journal" id="n-journal">Journal</a><a href="#argent" id="n-argent" class="adm-nav">Et si…</a></nav>
 <section id="v-connexion" hidden><h1>Les Dionysiades</h1><div id="x-out"></div></section>
-<section id="v-aujourdhui"><h1>Aujourd'hui</h1><div id="a-out"></div></section>
+<section id="v-aujourdhui"><p class="coach" id="coach" aria-live="polite"></p>
+<div class="scene" id="scene" role="group" aria-label="Portant tournant : les articles à chercher"><div class="rail"></div><div class="ring" id="ring"></div><div class="floor"></div></div>
+<div class="navb"><button type="button" id="prev" aria-label="Article précédent">‹</button><p id="pos" class="grey"></p><button type="button" id="next" aria-label="Article suivant">›</button></div>
+<div id="a-out"></div></section>
+<section id="v-plan" hidden><h1>Mes étapes</h1><div id="p-out"></div><a class="ext" href="#aujourdhui">Retour</a></section>
+<section id="v-annonce" hidden><h1>Une annonce</h1><div id="n-out"></div><a class="ext" href="#aujourdhui">Retour</a></section>
 <section id="v-releve" hidden><h1>Relevé du jour</h1><div id="r-out"></div><a class="ext" href="#aujourdhui">Retour</a></section>
 <section id="v-chercher" hidden><h1>À chercher</h1><div id="c-out"></div><a class="ext" href="#aujourdhui">Retour</a></section>
 <section id="v-journal" hidden><h1>Mon journal</h1><div id="j-out"></div></section>
@@ -195,6 +225,27 @@ let config = {
     "points_par_cran": {
       "valeur": 10,
       "hypothese": true
+    }
+  },
+  "nego": {
+    "remise_aujourdhui_pct": {
+      "valeur": 5,
+      "hypothese": true,
+      "note": "annonce du jour : on demande peu"
+    },
+    "remise_jours_pct": {
+      "valeur": 15,
+      "hypothese": true
+    },
+    "remise_mois_pct": {
+      "valeur": 30,
+      "hypothese": true,
+      "note": "annonce ancienne : le vendeur veut s'en débarrasser"
+    },
+    "remise_max_pct": {
+      "valeur": 40,
+      "hypothese": true,
+      "note": "au-delà, l'offre est souvent refusée ou impossible"
     }
   }
 };
@@ -487,8 +538,9 @@ const PKEY = 'dionysiades-plan';
 let faites = [];
 try { const s = JSON.parse(localStorage.getItem(PKEY) || 'null'); if (Array.isArray(s)) faites = s.filter((id) => ETAPES.some((e) => e.id === id)); } catch (e) {}
 const BRAVOS = ['Bravo, c\'est parti !', 'Super, continue !', 'Encore une de faite !', 'Tu avances bien !'];
-function renderAujourdhui() {
-  const o = document.getElementById('a-out'), p = prochaineEtape(faites), av = avancement(faites), b = bilan(etat, config, auj());
+function renderAujourdhui() { renderPlan(); renderAccueil(); }
+function renderPlan() {
+  const o = document.getElementById('p-out'), p = prochaineEtape(faites), av = avancement(faites);
   let h = '<div class="card"><div class="bar"><div style="width:' + av.pct + '%"></div></div><p class="grey">' + av.faites + ' étapes faites sur ' + av.total + (av.faites ? '. ' + BRAVOS[av.faites % BRAVOS.length] : '.') + '</p></div>';
   if (p) { const c = p.cout ? eur(config[p.cout[0]][p.cout[1]].valeur) + (p.coutTexte ? ' ' + p.coutTexte : '') : p.coutTexte;
     h += '<div class="card"><p class="grey">Semaine ' + p.semaine + ' · à faire maintenant</p><p class="big">' + esc(p.titre) + '</p><p>' + esc(p.pourquoi) + '</p>'
@@ -497,16 +549,11 @@ function renderAujourdhui() {
       + '<button type="button" class="btn go" data-fait="' + p.id + '">C\'est fait</button>'
       + '<details><summary><span>D\'où ça vient ?</span><span class="grey">Voir</span></summary><p class="why">' + (p.source ? 'Source : ' + esc(p.source) : 'Conseil du plan de démarrage. Le temps indiqué est une estimation.') + '</p><p class="why">À faire valider par un professionnel pour les démarches.</p></details></div>';
   } else h += '<div class="card"><p class="big">Les 30 jours sont finis.</p><p>Regarde ton journal avec Cyrille.</p></div>';
-  const aExp = etat.articles.filter((a) => a.statut === 'vendu').length, aPub = etat.articles.filter((a) => ['acheté', 'récupéré', 'photographié'].includes(a.statut)).length;
-  h += '<div class="card"><a class="tile" href="#releve"><span>Relevé du jour</span><b>' + (faitAujourdhui(releves, auj()) ? 'Fait' : 'À faire') + '</b></a></div><div class="card"><a class="tile" href="#chercher"><span>À chercher</span><b>Voir</b></a></div>';
-  h += '<div class="card"><a class="tile" href="#journal"><span>À acheter</span><b>' + (achatsAutorises(faites) ? eur(Math.max(0, b.disponible)) : 'Pas encore') + '</b></a></div>'
-    + '<div class="card"><a class="tile" href="#journal"><span>À expédier</span><b>' + aExp + ' colis</b></a></div>'
-    + '<div class="card"><a class="tile" href="#journal"><span>À publier</span><b>' + aPub + ' article' + (aPub > 1 ? 's' : '') + '</b></a></div>';
   if (CLOUD && role === 'admin' && faites.length) { const der = ETAPES.find((e) => e.id === faites[faites.length - 1]);
     h += '<details class="card adm"><summary><b>Étapes (Admin)</b><span class="grey">Ouvrir</span></summary><p class="grey">Dernière étape cochée</p><p>' + esc(der.titre) + '</p><button type="button" class="btn" data-defaire="' + der.id + '">Décocher cette étape</button></details>'; }
   o.innerHTML = h;
 }
-document.getElementById('a-out').addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d) return;
+document.getElementById('p-out').addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d) return;
   if (d.defaire) { if (CLOUD && role === 'admin' && d.defaire === faites[faites.length - 1]) envoyer([{ table: 'plan_etapes', type: 'delete', cle: 'etape_id', id: d.defaire }], () => {}, () => {}); return; }
   if (!d.fait) return;
   let nf; try { nf = valider(faites, d.fait); } catch (e) { return; }
@@ -653,12 +700,122 @@ function renderChercher() {
   }
   o.innerHTML = h;
 }
-function vue() { const N = ['aujourdhui', 'journal', 'argent', 'releve', 'chercher'];
+// « Regarde cette annonce » : combien offrir, jusqu'où aller, et le message à envoyer. Règles simples, toutes dans la config.
+const bas50 = (n) => Math.floor(n * 2 + 1e-9) / 2;
+const arr2 = (n) => Math.round(n * 100) / 100;
+const ANCIENNETES = ['aujourdhui', 'jours', 'mois'];
+// Ce que l'article coûte vraiment : sur Vinted l'acheteur paie des frais en plus du prix, plus le port.
+function coutReel(prix, plateforme, port, c) {
+  return arr2(plateforme === 'vinted' ? prix * (1 + c.vinted.frais_acheteur_pct.valeur / 100) + c.vinted.frais_acheteur_fixe_eur.valeur + port : prix + port);
+}
+function analyserAnnonce({ prix, port = 0, plateforme = 'vinted', anciennete = 'jours', revente, maxParArticle = null }, c, gainArticle) {
+  for (const [n, v] of [['Prix', prix], ['Prix de revente', revente]]) if (!Number.isFinite(v) || v <= 0) throw new Error(n + ' : écris un nombre');
+  if (!Number.isFinite(port) || port < 0) throw new Error('Frais de port : écris un nombre');
+  if (!ANCIENNETES.includes(anciennete)) throw new Error('Choisis depuis quand l\'annonce est en ligne');
+  const g = (p) => gainArticle({ achat: coutReel(p, plateforme, port, c), vente: revente }, c);
+  const vert = (p) => { const x = g(p); return x.gain >= c.feux.vert_gain_min_eur.valeur && x.roiPct >= c.feux.vert_roi_min_pct.valeur && (maxParArticle === null || coutReel(p, plateforme, port, c) <= maxParArticle); };
+  let prixMax = 0; for (let p = 0.5; p <= prix + 1e-9; p = arr2(p + 0.5)) if (vert(p)) prixMax = p;
+  const remise = c.nego['remise_' + anciennete + '_pct'].valeur, plancher = prix * (1 - c.nego.remise_max_pct.valeur / 100);
+  const souhait = Math.max(0.5, bas50(prix * (1 - remise / 100)));
+  let verdict, offre = null; const raisons = [];
+  if (vert(prix)) { verdict = 'acheter'; offre = souhait; raisons.push('Même au prix affiché, tu gagnes assez.'); raisons.push('Demande quand même un petit geste.'); }
+  else if (prixMax > 0 && prixMax >= plancher - 1e-9) { verdict = 'negocier'; offre = Math.min(souhait, prixMax); raisons.push('Au prix affiché, tu ne gagnes pas assez.'); if (maxParArticle !== null && coutReel(prix, plateforme, port, c) > maxParArticle) raisons.push('Il dépasse ton maximum par article.'); }
+  else { verdict = 'passer'; raisons.push(prixMax > 0 ? 'Il faudrait une trop grosse remise.' : 'Même très négocié, tu ne gagnes pas assez.'); }
+  if (plateforme === 'vinted') raisons.push('Vinted ajoute ses frais au prix : je les ai comptés.');
+  const fin = offre === null ? null : g(offre);
+  return { verdict, offre, prixMax, coutAffiche: coutReel(prix, plateforme, port, c), coutOffre: offre === null ? null : coutReel(offre, plateforme, port, c), gainOffre: fin ? fin.gain : null, gainAffiche: g(prix).gain, raisons };
+}
+const eurTxt = (n) => (Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ',')) + ' €';
+// Message poli, court, honnête : pas de fausse raison, pas de pression.
+function messageOffre({ nom, offre, anciennete, verdict }) {
+  const article = (nom || 'article').trim();
+  if (verdict === 'acheter') return 'Bonjour, votre annonce « ' + article + ' » m\'intéresse. Accepteriez-vous ' + eurTxt(offre) + ' ? Je peux payer tout de suite. Merci et bonne journée !';
+  const debut = anciennete === 'mois' ? 'Bonjour, je vois que votre annonce « ' + article + ' » est en ligne depuis un moment. ' : 'Bonjour, votre annonce « ' + article + ' » m\'intéresse. ';
+  return debut + 'Seriez-vous d\'accord pour ' + eurTxt(offre) + ' ? Si oui, je l\'achète tout de suite. Merci et bonne journée !';
+}
+// Un lien n'est accepté que s'il est en https : jamais de lien fabriqué qui exécuterait du code.
+const lienSur = (s) => (/^https:\/\/[^\s"'<>]+$/.test((s || '').trim()) ? s.trim() : null);
+
+// ---------- Accueil : le portant qui tourne ----------
+const PICTOS = { Jouets: ["...###...","..#...#..",".#.#.#.#.",".#.....#.",".#.#.#.#.",".#.....#.",".#.#.#.#.","..#...#..","...###..."], Livres: ["#########","#...#...#","#.#.#.#.#","#...#...#","#.#.#.#.#","#...#...#","#.#.#.#.#","#...#...#","#########"], Pulls: ["..##.##..",".#######.","#########","##.###.##","#..###..#","#..###..#","...###...","...###...","...###..."], Jeans: ["..#####..","..#####..","..#####..","..##.##..","..##.##..","..##.##..","..##.##..","..##.##..","..##.##.."], Tenues: ["...#.#...","...###...","...###...","..#####..","..#####..",".#######.",".#######.","#########","#########"], Manteaux: ["..##.##..",".#######.","#########","#########","#.#####.#","#.#####.#","..#####..","..#####..","..#####.."] };
+const PICTO_DEFAUT = ["..#####..",".#######.","#########","#.#####.#","#.#####.#","..#####..","..#####..","..#####..","..#...#.."];
+const pictoDe = (nom) => PICTOS[Object.keys(PICTOS).find((k) => nom.startsWith(k))] || PICTO_DEFAUT;
+const svgPicto = (rows) => '<svg aria-hidden="true" width="76" height="76" viewBox="0 0 54 54" fill="#14181d">' + rows.map((r, y) => [...r].map((ch, x) => (ch === '#' ? '<circle cx="' + (3 + x * 6) + '" cy="' + (3 + y * 6) + '" r="2.3"/>' : '')).join('')).join('') + '</svg>';
+const CINTRE = '<svg class="hanger" aria-hidden="true" width="112" height="28" viewBox="0 0 120 30" fill="none" stroke="#14181d" stroke-width="2" stroke-linecap="round" opacity=".7"><path d="M60 2v8M60 10 8 26h104z"/></svg>';
+const coulScore = (s) => (s >= 70 ? '#1e7a3c' : s >= 50 ? '#b45309' : '#b91c1c');
+const RAYON = 178; let portant = [], angleP = 0, devant = 0, signature = '', dejaSalue = false;
+const calme = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+function dire(txt) { const c = document.getElementById('coach'); if (c._dit === txt) return; c._dit = txt; if (calme() || typeof setInterval !== 'function' || globalThis.__SB_TEST) { c.textContent = txt; return; } clearInterval(dire.t); let k = 0; c.textContent = ''; dire.t = setInterval(() => { c.textContent = txt.slice(0, ++k); if (k >= txt.length) clearInterval(dire.t); }, 16); }
+function poserPortant() { const ring = document.getElementById('ring'), n = portant.length; if (!n) return; const pas = 360 / n;
+  ring.style.transform = 'translateZ(-' + RAYON + 'px) rotateY(' + angleP + 'deg)'; devant = ((Math.round(-angleP / pas) % n) + n) % n;
+  [...(ring.children || [])].forEach((p, i) => { const d = Math.min((i - devant + n) % n, (devant - i + n) % n); p.style.opacity = d === 0 ? 1 : d === 1 ? 0.75 : 0.35; }); }
+function allerA(i) { const n = portant.length; if (!n) return; const d = ((-i * 360 / n - angleP) % 360 + 540) % 360 - 180; angleP += d; poserPortant(); ficheAccueil(); }
+function renderAccueil() {
+  portant = classement(TENDANCES, releves, auj(), config); const sig = portant.map((t) => t.nom + t.score).join('|');
+  if (sig !== signature) { signature = sig; const pas = 360 / (portant.length || 1);
+    document.getElementById('ring').innerHTML = portant.map((t, i) => '<div class="piece" data-i="' + i + '" style="transform:rotateY(' + i * pas + 'deg) translateZ(' + RAYON + 'px)"><div class="swing" style="animation-delay:' + (-i * 0.6) + 's"><div class="hook"></div>' + CINTRE + '<div class="etq">' + svgPicto(pictoDe(t.nom)) + '<span>' + esc(t.nom) + '</span><div class="dot" style="width:16px;height:16px;background:' + coulScore(t.score) + '"></div></div></div></div>').join('');
+    angleP = 0; }
+  poserPortant(); ficheAccueil(); }
+function ficheAccueil() { const o = document.getElementById('a-out'), t = portant[devant]; if (!t) { o.innerHTML = '<div class="card"><p>Je prépare ta sélection.</p></div>'; return; }
+  const b = bilan(etat, config, auj()), ouvert = achatsAutorises(faites), av = avancement(faites);
+  document.getElementById('pos').textContent = (devant + 1) + ' sur ' + portant.length;
+  dire(!dejaSalue ? 'Voici ce que j\'ai choisi pour toi. Fais tourner.' : t.score >= 70 ? 'Celui-là, cherche-le aujourd\'hui.' : t.score >= 50 ? 'Celui-là, seulement à petit prix.' : 'Celui-là, laisse-le pour l\'instant.'); dejaSalue = true;
+  let prix = '<p class="grey">Montre-moi une annonce : je te dis le bon prix.</p>';
+  if (t.prixCourant) { let m = prixAchatMax({ vente: t.prixCourant }, config); if (etat.apports.length) m = Math.min(m, b.maxParArticle); prix = m > 0 ? '<p>Se vend autour de <b>' + eur(t.prixCourant) + '</b>. Paie au maximum <b>' + eur(m) + '</b>.</p>' : '<p>Se vend autour de <b>' + eur(t.prixCourant) + '</b>. Pas assez pour gagner.</p>'; }
+  const q = encodeURIComponent(t.recherche || t.nom);
+  let h = '<div class="card"><div class="row"><div class="dot" style="background:' + coulScore(t.score) + '"></div><p class="big">' + esc(t.nom) + '</p></div><p>' + esc(t.raison) + '.</p>' + prix
+    + (t.score >= 50 ? '<button type="button" class="btn go" data-annonce="' + devant + '">J\'ai trouvé une annonce</button><div class="grid"><a class="sec" target="_blank" rel="noopener" href="https://www.vinted.fr/catalog?order=newest_first&search_text=' + q + '">Voir sur Vinted</a><a class="sec" target="_blank" rel="noopener" href="https://www.leboncoin.fr/recherche?locations=Paris&sort=time&text=' + q + '">Leboncoin</a></div>' : '<p class="grey">Trop cher ou trop gros pour toi en ce moment.</p>')
+    + (ouvert ? '' : '<p class="grey">Tu peux regarder. Pour acheter, finis d\'abord <a class="ext" href="#plan">tes étapes</a>.</p>')
+    + '<details><summary><span>Pourquoi ?</span><span class="grey">Score ' + t.score + ' sur 100</span></summary><p class="why">Score de l\'agent : ' + t.scoreAgent + '. ' + (t.confirme ? 'Tes relevés le changent de ' + (t.ajustement > 0 ? '+' : '') + t.ajustement + '.' : 'Pas encore confirmé par tes relevés.') + '</p><p class="why">Confiance : ' + esc(t.confiance) + '. Source : ' + esc(t.source) + '</p></details></div>';
+  const aExp = etat.articles.filter((a) => a.statut === 'vendu').length, aPub = etat.articles.filter((a) => ['acheté', 'récupéré', 'photographié'].includes(a.statut)).length, sem = releves.filter((r) => (Date.parse(auj()) - Date.parse(r.date)) / 864e5 < 7).length;
+  h += '<div class="card"><p class="grey">Je travaille pour toi</p><p>Dernière analyse : <b>' + TENDANCES[0].date.split('-').reverse().join('/') + '</b>. ' + TENDANCES.length + ' familles classées.</p><p class="grey">' + sem + ' relevé' + (sem > 1 ? 's' : '') + ' de ta part cette semaine. ' + (faitAujourdhui(releves, auj()) ? 'Celui du jour est fait.' : '<a class="ext" href="#releve">Faire celui du jour</a>') + '</p></div>';
+  h += '<div class="pills"><a href="#plan"><b>' + av.faites + '/' + av.total + '</b>Étapes</a><a href="#journal"><b>' + aExp + '</b>À expédier</a><a href="#journal"><b>' + aPub + '</b>À publier</a><a href="#journal"><b>' + (ouvert ? Math.max(0, Math.floor(b.disponible)) + ' €' : '—') + '</b>À dépenser</a></div>';
+  o.innerHTML = h; }
+document.getElementById('prev').addEventListener('click', () => allerA((devant - 1 + portant.length) % portant.length));
+document.getElementById('next').addEventListener('click', () => allerA((devant + 1) % portant.length));
+(() => { const sc = document.getElementById('scene'), ring = document.getElementById('ring'); let x0 = null, a0 = 0, bouge = false;
+  sc.addEventListener('pointerdown', (e) => { x0 = e.clientX; a0 = angleP; bouge = false; ring.classList.add('drag'); try { sc.setPointerCapture(e.pointerId); } catch (er) {} });
+  sc.addEventListener('pointermove', (e) => { if (x0 === null) return; const dx = e.clientX - x0; if (Math.abs(dx) > 6) bouge = true; angleP = a0 + dx * 0.45; poserPortant(); });
+  const lacher = (e) => { if (x0 === null) return; x0 = null; ring.classList.remove('drag'); const n = portant.length; if (!n) return;
+    if (!bouge) { const p = document.elementFromPoint(e.clientX, e.clientY), el = p && p.closest('.piece'); if (el) { allerA(+el.dataset.i); return; } }
+    allerA(((Math.round(-angleP / (360 / n)) % n) + n) % n); };
+  sc.addEventListener('pointerup', lacher); sc.addEventListener('pointercancel', lacher); })();
+document.getElementById('a-out').addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d || !('annonce' in d)) return; const t = portant[+d.annonce]; ann = { ...ANN0, nom: t ? t.nom : '', revente: t && t.prixCourant ? String(t.prixCourant) : '' }; annRes = null; annErr = ''; location.hash = '#annonce'; if (typeof window.dispatchEvent !== 'function') vue(); });
+// ---------- Une annonce : combien offrir, quoi écrire ----------
+const ANN0 = { nom: '', plateforme: 'vinted', anciennete: 'jours', prix: '', port: '', revente: '', lien: '' };
+let ann = { ...ANN0 }, annRes = null, annErr = '', annCopie = false;
+const PLATS = [['vinted', 'Vinted'], ['leboncoin', 'Leboncoin'], ['autre', 'Autre']], ANCS = [['aujourdhui', 'Aujourd\'hui'], ['jours', 'Quelques jours'], ['mois', 'Longtemps']];
+function lireAnn() { for (const k of ['nom', 'prix', 'port', 'revente', 'lien']) { const e = document.getElementById('an-' + k); if (e && typeof e.value === 'string') ann[k] = e.value; } }
+function renderAnnonce() { const o = document.getElementById('n-out');
+  const champ = (k, lab, type, aide) => '<label for="an-' + k + '">' + lab + '<input id="an-' + k + '" type="' + type + '"' + (type === 'number' ? ' inputmode="decimal" min="0" step="0.5"' : '') + ' value="' + esc(ann[k]) + '">' + (aide ? '<span class="grey">' + aide + '</span>' : '') + '</label>';
+  const choix = (k, liste) => '<div class="grid" style="grid-template-columns:repeat(3,1fr)">' + liste.map(([v, l]) => '<button type="button" class="btn' + (ann[k] === v ? ' sel' : '') + '" aria-pressed="' + (ann[k] === v) + '" data-' + k + '="' + v + '">' + l + '</button>').join('') + '</div>';
+  let h = '<div class="card">' + champ('nom', 'C\'est quoi ?', 'text') + '<p class="grey">Sur quel site ?</p>' + choix('plateforme', PLATS) + champ('prix', 'Prix affiché (€)', 'number') + champ('port', 'Frais de port (€)', 'number', 'Laisse vide si tu vas le chercher.')
+    + '<p class="grey">L\'annonce est en ligne depuis…</p>' + choix('anciennete', ANCS) + champ('revente', 'Tu le revends combien ? (€)', 'number', 'Je le remplis seul quand tu as fait des relevés.') + champ('lien', 'Lien de l\'annonce (facultatif)', 'url')
+    + (annErr ? '<p class="err">' + esc(annErr) + '</p>' : '') + '<button type="button" class="btn go" data-analyse="1">Dis-moi quoi faire</button></div>';
+  if (annRes) { const r = annRes, col = { acheter: '#1e7a3c', negocier: '#b45309', passer: '#b91c1c' }[r.verdict], mot = { acheter: 'ACHÈTE', negocier: 'NÉGOCIE', passer: 'PASSE' }[r.verdict], l = lienSur(ann.lien);
+    h += '<div class="card"><div class="row"><div class="dot" style="background:' + col + '"></div><p class="big">' + mot + '</p></div>' + r.raisons.map((x) => '<p>' + esc(x) + '</p>').join('');
+    if (r.offre !== null) { const msg = messageOffre({ nom: ann.nom, offre: r.offre, anciennete: ann.anciennete, verdict: r.verdict });
+      h += '<div class="row" style="justify-content:space-between"><span>Propose</span><b class="big">' + eur(r.offre) + '</b></div><div class="row" style="justify-content:space-between"><span>Ne dépasse pas</span><b>' + eur(r.prixMax) + '</b></div><div class="row" style="justify-content:space-between"><span>Il te coûtera en tout</span><b>' + eur(r.coutOffre) + '</b></div><div class="row" style="justify-content:space-between"><span>Tu gagnes environ</span><b>' + eur(r.gainOffre) + '</b></div>'
+        + '<p class="grey">Ton message, prêt à envoyer</p><p class="msg" id="an-msg">' + esc(msg) + '</p><button type="button" class="btn go" data-copier="1">' + (annCopie ? 'Copié !' : 'Copier le message') + '</button>' + (l ? '<a class="sec" target="_blank" rel="noopener" href="' + esc(l) + '">Ouvrir l\'annonce</a>' : '') + '<p class="grey">Colle le message dans le site, puis envoie.</p>'; }
+    h += '</div>'; }
+  o.innerHTML = h; }
+document.getElementById('n-out').addEventListener('click', (ev) => { const d = (ev.target.closest('button') || {}).dataset; if (!d) return; lireAnn();
+  if (d.plateforme) { ann.plateforme = d.plateforme; annRes = null; }
+  else if (d.anciennete) { ann.anciennete = d.anciennete; annRes = null; }
+  else if (d.analyse) { annCopie = false; try { const b = bilan(etat, config, auj()); if (!ann.nom.trim()) throw new Error('Dis-moi ce que c\'est.');
+      annRes = analyserAnnonce({ prix: parseFloat(ann.prix), port: ann.port.trim() === '' ? 0 : parseFloat(ann.port), plateforme: ann.plateforme === 'vinted' ? 'vinted' : 'autre', anciennete: ann.anciennete, revente: parseFloat(ann.revente), maxParArticle: etat.apports.length ? b.maxParArticle : null }, config, gainArticle); annErr = ''; } catch (e) { annRes = null; annErr = e.message; } }
+  else if (d.copier) { const m = document.getElementById('an-msg'); try { navigator.clipboard.writeText(m ? m.textContent : '').then(() => { annCopie = true; renderAnnonce(); }).catch(() => {}); } catch (e) {} return; }
+  else return;
+  renderAnnonce(); });
+// Partage Android : une annonce partagée vers l'application arrive ici, déjà remplie.
+(() => { try { const p = new URLSearchParams(location.search), brut = [p.get('lien'), p.get('texte'), p.get('titre')].filter(Boolean).join(' '); if (!brut) return;
+  const m = brut.match(/https:\/\/[^\s"'<>]+/); ann = { ...ANN0, lien: m ? m[0] : '', nom: (p.get('titre') || '').slice(0, 80), plateforme: /leboncoin/i.test(brut) ? 'leboncoin' : /vinted/i.test(brut) ? 'vinted' : 'autre' }; location.hash = '#annonce'; } catch (e) {} })();
+function vue() { const N = ['aujourdhui', 'journal', 'argent', 'releve', 'chercher', 'plan', 'annonce'];
   const bloque = CLOUD && !pret; document.getElementById('v-connexion').hidden = !bloque; document.getElementById('nav').hidden = bloque;
   if (bloque) { for (const n of N) document.getElementById('v-' + n).hidden = true; renderConnexion(); return; }
   const h = N.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'aujourdhui';
   for (const n of N) { document.getElementById('v-' + n).hidden = n !== h; const nav = document.getElementById('n-' + n); if (nav) nav.className = n === h ? 'on' : ''; }
-  if (h === 'aujourdhui') renderAujourdhui(); if (h === 'releve') renderReleve(); if (h === 'chercher') renderChercher(); }
+  if (h === 'aujourdhui') renderAccueil(); if (h === 'plan') renderPlan(); if (h === 'annonce') renderAnnonce(); if (h === 'releve') renderReleve(); if (h === 'chercher') renderChercher(); }
 // ---------- Base de données (Supabase) : seulement quand l'application est à sa vraie adresse ----------
 // Passage entre la base (lignes Supabase) et l'état de l'application. Fonctions pures, testées.
 const n = (x) => (x === null || x === undefined ? null : Number(x));
