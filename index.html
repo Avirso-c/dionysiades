@@ -421,7 +421,7 @@ const FORMS = {
   materiel: { titre: 'J\'ai acheté du matériel', champs: [['f-prix', 'Combien ? (€)', 'number'], ['f-nom', 'C\'est quoi ?', 'text']], ok: () => ajouterDepense(etat, { type: 'materiel', montant: num('f-prix'), date: auj(), note: txt('f-nom') }) } };
 function renderJournal() {
   const o = document.getElementById('j-out'), b = bilan(etat, config, auj());
-  let h = '<p class="grey">Ces données restent sur cet appareil pour l\'instant.</p>';
+  let h = CLOUD ? '' : '<p class="grey">Ces données restent sur cet appareil pour l\'instant.</p>';
   if (!etat.apports.length) h += '<div class="card"><p class="big">Commence ici.</p><p>Dis-moi combien tu as mis.</p></div>';
   else {
     const neg = b.disponible <= 0;
